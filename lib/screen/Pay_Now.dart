@@ -359,7 +359,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 context,
                 MaterialPageRoute(
                   builder: (context) =>
-                      InvoicePage(amount: _amount, method: method),
+                          InvoicePage(amount: _amount, method: method),
                 ),
               );
             },
