@@ -1,6 +1,4 @@
 //import 'package:flutter/material.dart';
-
-كريم
 //import "package:lifelink/screen/login_screen.dart";
 
 //class SplashScreen extends StatefulWidget {
