@@ -5,6 +5,7 @@ import 'package:lifelink/screen/home_screen.dart';
 import 'package:lifelink/screen/Pay_Now.dart';
 import 'package:lifelink/screen/invoice_page.dart';
 import 'package:lifelink/screen/admin.dart';
+import 'package:lifelink/screen/blood_Inventory.dart';
 
 void main() {
   runApp(const MyApp());
@@ -19,11 +20,12 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: const AdminPage(),
+      home: const BloodInventoryAdminPage(),
       routes: {
         "signupScreen": (context) => const SignupScreen(),
         "loginScreen": (context) => const LoginScreen(),
         "admin": (context) => const AdminPage(),
+        "bloodInventoryAdmin": (context) => const BloodInventoryAdminPage(),
         "homeScreen": (context) => const HomeScreen(),
         "payNow": (context) => const PayNow(),
         "invoicePage": (context) => const InvoicePage(amount: 0, method: ''),
