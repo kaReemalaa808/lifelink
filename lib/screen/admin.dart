@@ -3,6 +3,16 @@ import 'package:flutter/material.dart';
 class AdminPage extends StatelessWidget {
   const AdminPage({super.key});
 
+  // دالة للمساعدة على الانتقال لغلق أي Dialog مفتوح
+  void _navigateAndCloseDialog(BuildContext context, String routeName) {
+    // أولًا نغلق أي Dialog مفتوح (لو موجود)
+    if (Navigator.canPop(context)) {
+      Navigator.pop(context); // يقفل الـ AlertDialog أو الـ Drawer المفتوح
+    }
+    // بعد كده ننتقل للصفحة المطلوبة
+    Navigator.of(context).pushNamed(routeName);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,6 +42,7 @@ class AdminPage extends StatelessWidget {
               leading: const Icon(Icons.dashboard),
               title: const Text("Dashboard"),
               onTap: () {
+                // اغلق أي Dialog وارجع للـ Dashboard
                 Navigator.pop(context);
               },
             ),
@@ -40,7 +51,7 @@ class AdminPage extends StatelessWidget {
               leading: const Icon(Icons.inventory),
               title: const Text("Blood Inventory"),
               onTap: () {
-                Navigator.pop(context);
+                _navigateAndCloseDialog(context, "bloodInventoryAdmin");
               },
             ),
 

@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: const BloodInventoryAdminPage(),
+      home: const AdminPage(),
       routes: {
         "signupScreen": (context) => const SignupScreen(),
         "loginScreen": (context) => const LoginScreen(),
