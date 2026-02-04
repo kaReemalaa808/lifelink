@@ -9,7 +9,7 @@ class BloodInventoryAdminPage extends StatefulWidget {
 }
 
 class _BloodInventoryAdminPageState extends State<BloodInventoryAdminPage> {
-  final List<String> bloodTypes = const [
+  final List<String> bloodTypes = [
     "A+",
     "A-",
     "B+",
@@ -20,24 +20,18 @@ class _BloodInventoryAdminPageState extends State<BloodInventoryAdminPage> {
     "O-",
   ];
 
-  final List<String> hospitals = const [
-    "مستشفى السلام",
-    "مستشفى النور",
-    "مستشفى الرحمة",
-  ];
-
   void _showEditDialog(String bloodType) {
     String? selectedHospital;
     final TextEditingController quantityController = TextEditingController();
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (_) => AlertDialog(
         title: Row(
-          children: [
-            const Icon(Icons.edit, color: Color(0xFF00A7B3)),
-            const SizedBox(width: 8),
-            Text("Edit $bloodType"),
+          children: const [
+            Icon(Icons.edit, color: Color(0xFF00A7B3)),
+            SizedBox(width: 8),
+            Text("Edit Blood Stock"),
           ],
         ),
         content: Column(
@@ -48,18 +42,25 @@ class _BloodInventoryAdminPageState extends State<BloodInventoryAdminPage> {
                 labelText: "Select Hospital",
                 border: OutlineInputBorder(),
               ),
-              items: hospitals.map((hospital) {
-                return DropdownMenuItem<String>(
-                  value: hospital,
-                  child: Text(hospital),
-                );
-              }).toList(),
+              items: const [
+                DropdownMenuItem(
+                  value: "مستشفى السلام",
+                  child: Text("مستشفى السلام"),
+                ),
+                DropdownMenuItem(
+                  value: "مستشفى النور",
+                  child: Text("مستشفى النور"),
+                ),
+                DropdownMenuItem(
+                  value: "مستشفى الرحمة",
+                  child: Text("مستشفى الرحمة"),
+                ),
+              ],
               onChanged: (value) {
                 selectedHospital = value;
-                quantityController.text = "0"; // قيمة مؤقتة
               },
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 16),
             TextField(
               controller: quantityController,
               keyboardType: TextInputType.number,
@@ -71,16 +72,11 @@ class _BloodInventoryAdminPageState extends State<BloodInventoryAdminPage> {
           ],
         ),
         actions: [
-          // Cancel
           TextButton(
-            style: TextButton.styleFrom(
-              foregroundColor: Colors.black,
-              backgroundColor: Colors.grey[200],
-            ),
+            style: TextButton.styleFrom(foregroundColor: Colors.black),
             onPressed: () => Navigator.pop(context),
             child: const Text("Cancel"),
           ),
-          // Save
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF00A7B3),
@@ -89,7 +85,7 @@ class _BloodInventoryAdminPageState extends State<BloodInventoryAdminPage> {
             onPressed: () {
               if (selectedHospital == null || quantityController.text.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Please complete all fields")),
+                  const SnackBar(content: Text("Please fill all fields")),
                 );
                 return;
               }
@@ -109,11 +105,86 @@ class _BloodInventoryAdminPageState extends State<BloodInventoryAdminPage> {
     );
   }
 
+  void _showAddHospitalDialog(String bloodType) {
+    final TextEditingController hospitalController = TextEditingController();
+    final TextEditingController quantityController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Row(
+          children: const [
+            Icon(Icons.add, color: Color(0xFF00A7B3)),
+            SizedBox(width: 8),
+            Text("Add Hospital"),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: hospitalController,
+              decoration: const InputDecoration(
+                labelText: "Hospital Name",
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: quantityController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: "Initial Bags",
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            style: TextButton.styleFrom(foregroundColor: Colors.black),
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancel"),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF00A7B3),
+              foregroundColor: Colors.white,
+            ),
+            onPressed: () {
+              if (hospitalController.text.isEmpty ||
+                  quantityController.text.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Please fill all fields")),
+                );
+                return;
+              }
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    "${hospitalController.text} added with ${quantityController.text} bags ✅",
+                  ),
+                ),
+              );
+            },
+            child: const Text("Save"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _navigateAndCloseDialog(BuildContext context, String routeName) {
+    if (Navigator.canPop(context)) Navigator.pop(context);
+    Navigator.of(context).pushNamed(routeName);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Blood Inventory"),
+        title: const Text("Admin Dashboard"),
         backgroundColor: const Color(0xFF00A7B3),
       ),
       drawer: Drawer(
@@ -135,12 +206,14 @@ class _BloodInventoryAdminPageState extends State<BloodInventoryAdminPage> {
             ListTile(
               leading: const Icon(Icons.dashboard),
               title: const Text("Dashboard"),
-              onTap: () => Navigator.pop(context),
+              onTap: () {
+                Navigator.pop(context);
+              },
             ),
             ListTile(
               leading: const Icon(Icons.inventory),
               title: const Text("Blood Inventory"),
-              onTap: () => Navigator.pop(context),
+              onTap: () {},
             ),
             ListTile(
               leading: const Icon(Icons.people),
@@ -157,7 +230,9 @@ class _BloodInventoryAdminPageState extends State<BloodInventoryAdminPage> {
             ListTile(
               leading: const Icon(Icons.logout, color: Color(0xFF00A7B3)),
               title: const Text("Logout"),
-              onTap: () => Navigator.pop(context),
+              onTap: () {
+                Navigator.pop(context);
+              },
             ),
           ],
         ),
@@ -175,15 +250,30 @@ class _BloodInventoryAdminPageState extends State<BloodInventoryAdminPage> {
                 type,
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
-              subtitle: const Text("Total bags: 0"), // مجرد واجهة
-              trailing: ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF00A7B3),
-                  foregroundColor: Colors.white,
-                ),
-                onPressed: () => _showEditDialog(type),
-                icon: const Icon(Icons.edit, size: 18, color: Colors.white),
-                label: const Text("Edit"),
+              subtitle: const Text("Total bags: --"),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF00A7B3),
+                      foregroundColor: Colors.white,
+                    ),
+                    onPressed: () => _showEditDialog(type),
+                    icon: const Icon(Icons.edit, size: 18),
+                    label: const Text("Edit"),
+                  ),
+                  const SizedBox(width: 8),
+                  ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      foregroundColor: Colors.white,
+                    ),
+                    onPressed: () => _showAddHospitalDialog(type),
+                    icon: const Icon(Icons.add, size: 18),
+                    label: const Text("Add"),
+                  ),
+                ],
               ),
             ),
           );
