@@ -19,6 +19,9 @@ class _LoginScreenState extends State<LoginScreen> {
     //  password: _passwordController.text.trim(),
     //);
   }
+void openAdmin() {
+    Navigator.of(context).pushNamed("adminScreen");
+  }
 
   void openHomeScreen() {
     Navigator.of(context).pushNamed("homeScreen");
