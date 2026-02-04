@@ -186,8 +186,21 @@ class _BloodInventoryAdminPageState extends State<BloodInventoryAdminPage> {
     return Scaffold(
       // AppBar و Drawer
       appBar: AppBar(
-        title: const Text("Admin Dashboard"),
+        title: const Text("Blood Inventory Management"),
         backgroundColor: const Color(0xFF00A7B3),
+        iconTheme: IconThemeData(color: Colors.white),
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: Icon(Icons.menu_open, color: Colors.white, size: 30),
+            onPressed: () => Scaffold.of(context).openDrawer(),
+          ),
+        ),
+        titleTextStyle: const TextStyle(
+          fontSize: 22,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+          fontFamily: "Cairo",
+        ),
       ),
       drawer: Drawer(
         child: Column(

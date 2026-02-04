@@ -59,8 +59,22 @@ class _AdminPageState extends State<AdminPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Admin Dashboard"),
+        centerTitle: true,
+        title: const Text("   Admin Home   "),
         backgroundColor: const Color(0xFF00A7B3),
+        iconTheme: IconThemeData(color: Colors.white),
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: Icon(Icons.menu_open, color: Colors.white, size: 30),
+            onPressed: () => Scaffold.of(context).openDrawer(),
+          ),
+        ),
+        titleTextStyle: const TextStyle(
+          fontSize: 28,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+          fontFamily: "Cairo",
+        ),
       ),
 
       drawer: Drawer(
@@ -74,20 +88,19 @@ class _AdminPageState extends State<AdminPage> {
                 backgroundColor: Colors.white,
                 child: Icon(
                   Icons.admin_panel_settings,
-                  color: Colors.white,
+                  color: Colors.black,
                   size: 40,
                 ),
               ),
             ),
 
             //ListTile(
-             // leading: const Icon(Icons.dashboard),
-             // title: const Text("Dashboard"),
-             // onTap: () {
-              //  Navigator.pop(context);
-              //},
+            // leading: const Icon(Icons.dashboard),
+            // title: const Text("Dashboard"),
+            // onTap: () {
+            //  Navigator.pop(context);
+            //},
             //),
-
             ListTile(
               leading: const Icon(Icons.inventory),
               title: const Text("Blood Inventory"),
