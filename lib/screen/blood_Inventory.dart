@@ -26,6 +26,11 @@ class _BloodInventoryAdminPageState extends State<BloodInventoryAdminPage> {
     "مستشفى الرحمة",
   ];
 
+  void _navigateAndCloseDrawer(BuildContext context, String routeName) {
+    Navigator.pop(context); // Close the drawer
+    Navigator.pushNamed(context, routeName);
+  }
+
   void _showEditDialog(String bloodType) {
     String? selectedHospital;
     final TextEditingController quantityController = TextEditingController();
@@ -200,15 +205,15 @@ class _BloodInventoryAdminPageState extends State<BloodInventoryAdminPage> {
                 ),
               ),
             ),
+            // ListTile(
+            // leading: const Icon(Icons.dashboard),
+            // title: const Text("Dashboard"),
+            // onTap: () => Navigator.pop(context),
+            //),
             ListTile(
-              leading: const Icon(Icons.dashboard),
-              title: const Text("Dashboard"),
-              onTap: () => Navigator.pop(context),
-            ),
-            ListTile(
-              leading: const Icon(Icons.inventory),
-              title: const Text("Blood Inventory"),
-              onTap: () => Navigator.pop(context),
+              leading: const Icon(Icons.admin_panel_settings),
+              title: const Text("Admin home"),
+              onTap: () => _navigateAndCloseDrawer(context, "admin"),
             ),
             ListTile(
               leading: const Icon(Icons.people),

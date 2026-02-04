@@ -80,13 +80,13 @@ class _AdminPageState extends State<AdminPage> {
               ),
             ),
 
-            ListTile(
-              leading: const Icon(Icons.dashboard),
-              title: const Text("Dashboard"),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
+            //ListTile(
+             // leading: const Icon(Icons.dashboard),
+             // title: const Text("Dashboard"),
+             // onTap: () {
+              //  Navigator.pop(context);
+              //},
+            //),
 
             ListTile(
               leading: const Icon(Icons.inventory),

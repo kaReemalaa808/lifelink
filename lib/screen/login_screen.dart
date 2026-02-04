@@ -18,9 +18,14 @@ class _LoginScreenState extends State<LoginScreen> {
     //    email: _emailController.text.trim(),
     //  password: _passwordController.text.trim(),
     //);
+    if (_emailController.text.contains('admin')) {
+      openAdmin();
+    } else {
+      openHomeScreen();
+    }
   }
 void openAdmin() {
-    Navigator.of(context).pushNamed("adminScreen");
+    Navigator.of(context).pushNamed("admin");
   }
 
   void openHomeScreen() {
