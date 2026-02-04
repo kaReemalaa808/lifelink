@@ -20,6 +20,12 @@ class _BloodInventoryAdminPageState extends State<BloodInventoryAdminPage> {
     "O-",
   ];
 
+  final List<String> hospitals = [
+    "مستشفى السلام",
+    "مستشفى النور",
+    "مستشفى الرحمة",
+  ];
+
   void _showEditDialog(String bloodType) {
     String? selectedHospital;
     final TextEditingController quantityController = TextEditingController();
@@ -42,20 +48,12 @@ class _BloodInventoryAdminPageState extends State<BloodInventoryAdminPage> {
                 labelText: "Select Hospital",
                 border: OutlineInputBorder(),
               ),
-              items: const [
-                DropdownMenuItem(
-                  value: "مستشفى السلام",
-                  child: Text("مستشفى السلام"),
-                ),
-                DropdownMenuItem(
-                  value: "مستشفى النور",
-                  child: Text("مستشفى النور"),
-                ),
-                DropdownMenuItem(
-                  value: "مستشفى الرحمة",
-                  child: Text("مستشفى الرحمة"),
-                ),
-              ],
+              items: hospitals.map((hospital) {
+                return DropdownMenuItem<String>(
+                  value: hospital,
+                  child: Text(hospital),
+                );
+              }).toList(),
               onChanged: (value) {
                 selectedHospital = value;
               },
@@ -160,6 +158,9 @@ class _BloodInventoryAdminPageState extends State<BloodInventoryAdminPage> {
                 return;
               }
               Navigator.pop(context);
+              setState(() {
+                hospitals.add(hospitalController.text);
+              });
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
@@ -175,14 +176,10 @@ class _BloodInventoryAdminPageState extends State<BloodInventoryAdminPage> {
     );
   }
 
-  void _navigateAndCloseDialog(BuildContext context, String routeName) {
-    if (Navigator.canPop(context)) Navigator.pop(context);
-    Navigator.of(context).pushNamed(routeName);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // AppBar و Drawer
       appBar: AppBar(
         title: const Text("Admin Dashboard"),
         backgroundColor: const Color(0xFF00A7B3),
@@ -206,14 +203,12 @@ class _BloodInventoryAdminPageState extends State<BloodInventoryAdminPage> {
             ListTile(
               leading: const Icon(Icons.dashboard),
               title: const Text("Dashboard"),
-              onTap: () {
-                Navigator.pop(context);
-              },
+              onTap: () => Navigator.pop(context),
             ),
             ListTile(
               leading: const Icon(Icons.inventory),
               title: const Text("Blood Inventory"),
-              onTap: () {},
+              onTap: () => Navigator.pop(context),
             ),
             ListTile(
               leading: const Icon(Icons.people),
@@ -230,54 +225,53 @@ class _BloodInventoryAdminPageState extends State<BloodInventoryAdminPage> {
             ListTile(
               leading: const Icon(Icons.logout, color: Color(0xFF00A7B3)),
               title: const Text("Logout"),
-              onTap: () {
-                Navigator.pop(context);
-              },
+              onTap: () => Navigator.pop(context),
             ),
           ],
         ),
       ),
-      body: ListView.builder(
+      // **المحتوى الرئيسي مع Scroll**
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
-        itemCount: bloodTypes.length,
-        itemBuilder: (context, index) {
-          final type = bloodTypes[index];
-          return Card(
-            margin: const EdgeInsets.symmetric(vertical: 6),
-            child: ListTile(
-              leading: const Icon(Icons.bloodtype, color: Color(0xFF00A7B3)),
-              title: Text(
-                type,
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              subtitle: const Text("Total bags: --"),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF00A7B3),
-                      foregroundColor: Colors.white,
+        child: Column(
+          children: bloodTypes.map((type) {
+            return Card(
+              margin: const EdgeInsets.symmetric(vertical: 6),
+              child: ListTile(
+                leading: const Icon(Icons.bloodtype, color: Color(0xFF00A7B3)),
+                title: Text(
+                  type,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                subtitle: const Text("Total bags: --"),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF00A7B3),
+                        foregroundColor: Colors.white,
+                      ),
+                      onPressed: () => _showEditDialog(type),
+                      icon: const Icon(Icons.edit, size: 18),
+                      label: const Text("Edit"),
                     ),
-                    onPressed: () => _showEditDialog(type),
-                    icon: const Icon(Icons.edit, size: 18),
-                    label: const Text("Edit"),
-                  ),
-                  const SizedBox(width: 8),
-                  ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      foregroundColor: Colors.white,
+                    const SizedBox(width: 8),
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        foregroundColor: Colors.white,
+                      ),
+                      onPressed: () => _showAddHospitalDialog(type),
+                      icon: const Icon(Icons.add, size: 18),
+                      label: const Text("Add"),
                     ),
-                    onPressed: () => _showAddHospitalDialog(type),
-                    icon: const Icon(Icons.add, size: 18),
-                    label: const Text("Add"),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          );
-        },
+            );
+          }).toList(),
+        ),
       ),
     );
   }
