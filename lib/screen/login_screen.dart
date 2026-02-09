@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lifelink/screen/home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -24,7 +25,8 @@ class _LoginScreenState extends State<LoginScreen> {
       openHomeScreen();
     }
   }
-void openAdmin() {
+
+  void openAdmin() {
     Navigator.of(context).pushNamed("admin");
   }
 
@@ -139,7 +141,16 @@ void openAdmin() {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child: GestureDetector(
-                    onTap: signIn,
+                    onTap: () {
+                      if (_emailController.text.isEmpty ||
+                          _passwordController.text.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text("Please fill in all fields")),
+                        );
+                      } else {
+                        HomeScreen();
+                      }
+                    },
                     child: Container(
                       padding: EdgeInsets.all(16.0),
                       decoration: BoxDecoration(
