@@ -1,22 +1,39 @@
 import 'package:flutter/material.dart';
 import 'invoice_page.dart';
 
-/// `PayNow` is a simple wrapper that provides RTL directionality
-/// and exposes the `PaymentScreen` so it can be pushed from the
-/// app's main `MaterialApp` without nesting another one.
 class PayNow extends StatelessWidget {
   const PayNow({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const Directionality(
-      textDirection: TextDirection.rtl,
-      child: PaymentScreen(),
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        useMaterial3: true,
+        brightness: Brightness.light,
+        fontFamily: 'Tajawal',
+        scaffoldBackgroundColor: const Color(0xFFF7F7F8),
+        textTheme: const TextTheme(
+          displayLarge: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+          displayMedium: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+          titleLarge: TextStyle(fontSize: 22, fontWeight: FontWeight.w700),
+          titleMedium: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+          bodyLarge: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+          bodyMedium: TextStyle(fontSize: 18),
+          bodySmall: TextStyle(fontSize: 16),
+        ),
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF00A7B3)),
+      ),
+      home: const Directionality(
+        textDirection: TextDirection.ltr,
+        child: PaymentScreen(),
+      ),
     );
   }
 }
 
-// --------------------------------------------------------------
+// ======================================================
+
 class PaymentScreen extends StatefulWidget {
   const PaymentScreen({super.key});
 
@@ -24,25 +41,73 @@ class PaymentScreen extends StatefulWidget {
   State<PaymentScreen> createState() => _PaymentScreenState();
 }
 
-enum PaymentMethod { vodafone, visa, mastercard }
+enum PaymentMethod { telda, visa, mastercard }
+
+enum OrderType { reservation, urgent }
 
 class _PaymentScreenState extends State<PaymentScreen> {
-  PaymentMethod _selected = PaymentMethod.vodafone;
+  PaymentMethod _selected = PaymentMethod.telda;
+  OrderType _orderType = OrderType.reservation;
+
   final double _amount = 200.0;
+  final _formKey = GlobalKey<FormState>();
+
+  final TextEditingController _cardNumberController = TextEditingController();
+  final TextEditingController _expiryController = TextEditingController();
+  final TextEditingController _cvvController = TextEditingController();
+
+  // ---------------- Formatting ----------------
+  void _formatCardNumber(String value) {
+    value = value.replaceAll(" ", "");
+    String newValue = "";
+    for (int i = 0; i < value.length; i++) {
+      newValue += value[i];
+      if ((i + 1) % 4 == 0 && i != value.length - 1) newValue += " ";
+    }
+    _cardNumberController.value = TextEditingValue(
+      text: newValue,
+      selection: TextSelection.collapsed(offset: newValue.length),
+    );
+  }
+
+  void _formatExpiry(String value) {
+    value = value.replaceAll("/", "");
+    if (value.length >= 3)
+      value = value.substring(0, 2) + "/" + value.substring(2);
+    _expiryController.value = TextEditingValue(
+      text: value,
+      selection: TextSelection.collapsed(offset: value.length),
+    );
+  }
+
+  void _clearCardData() {
+    _cardNumberController.clear();
+    _expiryController.clear();
+    _cvvController.clear();
+  }
 
   @override
+  void dispose() {
+    _clearCardData();
+    _cardNumberController.dispose();
+    _expiryController.dispose();
+    _cvvController.dispose();
+    super.dispose();
+  }
+
+  // ================= BUILD ======================
+  @override
   Widget build(BuildContext context) {
-    final themeText = Theme.of(context).textTheme;
-    final colorScheme = Theme.of(context).colorScheme;
-    final primary = colorScheme.primary;
+    final theme = Theme.of(context);
+    final text = theme.textTheme;
+    final primary = theme.colorScheme.primary;
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        centerTitle: false,
+        elevation: 1,
+        backgroundColor: Colors.white,
+        automaticallyImplyLeading: false,
         title: Row(
-          mainAxisSize: MainAxisSize.min,
           children: [
             Container(
               width: 36,
@@ -51,248 +116,143 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 color: primary,
                 borderRadius: BorderRadius.circular(9),
               ),
-              child: const Icon(Icons.bloodtype, color: Colors.white, size: 20),
+              child: const Icon(Icons.bloodtype, color: Colors.white),
             ),
             const SizedBox(width: 10),
-            Text('بنك الدم', style: themeText.titleLarge),
+            Text("Lifelink", style: text.titleLarge),
           ],
         ),
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 18.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text('الدفع', style: themeText.displayMedium),
-              const SizedBox(height: 12),
-
-              // Summary card
-              Container(
-                decoration: BoxDecoration(
-                  color:
-                      Theme.of(context).scaffoldBackgroundColor == Colors.white
-                      ? Colors.white
-                      : Theme.of(context).cardColor,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: const Color(0xFFF1D4D4)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: primary.withOpacity(0.12),
-                      blurRadius: 12,
-                      offset: const Offset(0, 6),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text("Payment", style: text.displayMedium),
+            const SizedBox(height: 12),
+            _summaryCard(text, primary),
+            const SizedBox(height: 20),
+            Text("Order Type", style: text.titleMedium),
+            Row(
+              children: [
+                Expanded(
+                  child: RadioListTile<OrderType>(
+                    title: const Text(
+                      "Reservation",
+                      style: TextStyle(fontSize: 15),
                     ),
-                  ],
-                ),
-                padding: const EdgeInsets.all(18),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Text(
-                      'ملخص العملية',
-                      style: themeText.titleMedium!.copyWith(color: primary),
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('نوع الخدمة', style: themeText.bodyMedium),
-                        Text(
-                          'كيس دم فصيله AB+ ',
-                          style: themeText.bodyMedium!.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('المبلغ', style: themeText.bodyMedium),
-                        Text(
-                          '${_amount.toStringAsFixed(0)} جنيه',
-                          style: themeText.bodyLarge!.copyWith(
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 18),
-
-              Text('طريقة الدفع', style: themeText.titleMedium),
-              const SizedBox(height: 12),
-
-              // Vodafone Cash
-              _paymentTile(
-                title: 'Vodafone Cash ',
-                subtitle: 'سهل وسريع',
-                icon: Image.asset('images/01.png', width: 70, height: 70),
-                value: PaymentMethod.vodafone,
-              ),
-
-              const SizedBox(height: 10),
-
-              // Visa
-              _paymentTile(
-                title: 'VISA',
-                subtitle: 'استخدام البطاقة',
-                icon: Image.asset('images/03.png', width: 70, height: 70),
-                value: PaymentMethod.visa,
-              ),
-
-              const SizedBox(height: 10),
-
-              // Mastercard
-              _paymentTile(
-                title: 'Mastercard',
-                subtitle: 'استخدام البطاقة',
-                icon: Image.asset('images/02.png', width: 70, height: 70),
-                value: PaymentMethod.mastercard,
-              ),
-
-              const SizedBox(height: 24),
-
-              if (_selected != PaymentMethod.vodafone) ...[
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).cardColor,
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Text(
-                        'بيانات البطاقة',
-                        style: themeText.bodyMedium!.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      TextFormField(
-                        decoration: InputDecoration(
-                          hintText: '●●●● ●●●● ●●●● ●●●●',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 14,
-                          ),
-                        ),
-                        keyboardType: TextInputType.number,
-                      ),
-                      const SizedBox(height: 12),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: TextFormField(
-                              decoration: InputDecoration(
-                                hintText: 'MM/YY',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 14,
-                                ),
-                              ),
-                              keyboardType: TextInputType.datetime,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          SizedBox(
-                            width: 110,
-                            child: TextFormField(
-                              obscureText: true,
-                              decoration: InputDecoration(
-                                hintText: 'CVV',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 14,
-                                ),
-                              ),
-                              keyboardType: TextInputType.number,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                    value: OrderType.reservation,
+                    groupValue: _orderType,
+                    onChanged: (v) => setState(() => _orderType = v!),
                   ),
                 ),
-                const SizedBox(height: 20),
+                Expanded(
+                  child: RadioListTile<OrderType>(
+                    title: const Text("Urgent", style: TextStyle(fontSize: 15)),
+                    value: OrderType.urgent,
+                    groupValue: _orderType,
+                    onChanged: (v) => setState(() => _orderType = v!),
+                  ),
+                ),
               ],
-
-              SizedBox(
-                height: 56,
-                child: ElevatedButton(
-                  onPressed: _onPayPressed,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: primary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    elevation: 8,
-                  ),
-                  child: Text(
-                    'إتمام الدفع',
-                    style: themeText.bodyLarge!.copyWith(
-                      fontSize: 18,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 12),
-
-              Center(
-                child: Text(
-                  'جميع الحقوق محفوظة 2025',
-                  textAlign: TextAlign.center,
-                  style: themeText.bodySmall,
-                ),
-              ),
-            ],
-          ),
+            ),
+            const SizedBox(height: 20),
+            Text("Payment Method", style: text.titleMedium),
+            const SizedBox(height: 8),
+            _paymentTile(
+              title: "Telda",
+              subtitle: "Fast and easy",
+              icon: Image.asset("images/01.png", width: 55),
+              value: PaymentMethod.telda,
+            ),
+            const SizedBox(height: 10),
+            _paymentTile(
+              title: "VISA",
+              subtitle: "Card Payment",
+              icon: Image.asset("images/03.png", width: 55),
+              value: PaymentMethod.visa,
+            ),
+            const SizedBox(height: 10),
+            _paymentTile(
+              title: "Mastercard",
+              subtitle: "Card Payment",
+              icon: Image.asset("images/02.png", width: 55),
+              value: PaymentMethod.mastercard,
+            ),
+            const SizedBox(height: 25),
+            Form(key: _formKey, child: _cardForm(text)),
+            const SizedBox(height: 20),
+            _payBtn(primary, text),
+            const SizedBox(height: 10),
+            Center(
+              child: Text("All rights reserved 2025", style: text.bodySmall),
+            ),
+          ],
         ),
       ),
     );
   }
 
+  // ---------------- SUMMARY ----------------
+  Widget _summaryCard(TextTheme text, Color primary) {
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFE7C6C6)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Transaction Summary",
+            style: text.titleMedium!.copyWith(color: primary),
+          ),
+          const SizedBox(height: 10),
+          _row("Service Type", "AB+ Blood Bag"),
+          _row("Amount", "${_amount.toStringAsFixed(0)} EGP"),
+        ],
+      ),
+    );
+  }
+
+  Widget _row(String left, String right) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(left),
+          Text(right, style: const TextStyle(fontWeight: FontWeight.bold)),
+        ],
+      ),
+    );
+  }
+
+  // ---------------- PAYMENT TILE ----------------
   Widget _paymentTile({
     required String title,
-    String? subtitle,
+    required String subtitle,
     required Widget icon,
     required PaymentMethod value,
   }) {
-    final bool selected = _selected == value;
+    final selected = _selected == value;
+    final primary = Theme.of(context).colorScheme.primary;
+
     return GestureDetector(
-      onTap: () => setState(() => _selected = value),
-      child: Container(
+      onTap: () => setState(() {
+        _selected = value;
+        _clearCardData();
+      }),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: selected
-              ? Theme.of(context).colorScheme.primary
-              : Colors.white,
+          color: selected ? primary : Colors.white,
           borderRadius: BorderRadius.circular(14),
-          boxShadow: const [
-            BoxShadow(
-              color: Color(0x22000000),
-              blurRadius: 6,
-              offset: Offset(0, 3),
-            ),
-          ],
-          border: Border.all(color: const Color(0xFFDDE2E5)),
+          boxShadow: const [BoxShadow(color: Color(0x22000000), blurRadius: 6)],
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         child: Row(
           children: [
             icon,
@@ -303,29 +263,30 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 children: [
                   Text(
                     title,
-                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: selected ? Colors.white : Colors.black87,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: selected ? Colors.white : Colors.black,
                     ),
                   ),
-                  if (subtitle != null) const SizedBox(height: 4),
-                  if (subtitle != null)
-                    Text(
-                      subtitle,
-                      style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                        color: selected ? Colors.white70 : Colors.black54,
-                      ),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: selected ? Colors.white70 : Colors.black54,
                     ),
+                  ),
                 ],
               ),
             ),
-            Radio<PaymentMethod>(
+            Radio(
               value: value,
               groupValue: _selected,
-              onChanged: (v) => setState(() => _selected = v!),
-              activeColor: selected
-                  ? Colors.white
-                  : Theme.of(context).colorScheme.primary,
+              onChanged: (v) => setState(() {
+                _selected = v!;
+                _clearCardData();
+              }),
+              activeColor: selected ? Colors.white : primary,
             ),
           ],
         ),
@@ -333,37 +294,144 @@ class _PaymentScreenState extends State<PaymentScreen> {
     );
   }
 
+  // ---------------- CARD FORM ----------------
+  Widget _cardForm(TextTheme text) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Column(
+        children: [
+          Text(
+            "Card Details",
+            style: text.bodyMedium!.copyWith(fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: 12),
+          TextFormField(
+            controller: _cardNumberController,
+            keyboardType: TextInputType.number,
+            maxLength: 19,
+            onChanged: _formatCardNumber,
+            decoration: _input("●●●● ●●●● ●●●● ●●●●"),
+            validator: (value) {
+              if (value == null || value.isEmpty) return "Enter card number";
+              if (value.replaceAll(" ", "").length != 16)
+                return "Card must be 16 digits";
+              return null;
+            },
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: TextFormField(
+                  controller: _expiryController,
+                  keyboardType: TextInputType.number,
+                  maxLength: 5,
+                  onChanged: _formatExpiry,
+                  decoration: _input("MM/YY"),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) return "Enter expiry";
+                    if (!RegExp(r'^(0[1-9]|1[0-2])\/\d{2}$').hasMatch(value))
+                      return "Invalid format";
+                    return null;
+                  },
+                ),
+              ),
+              const SizedBox(width: 12),
+              SizedBox(
+                width: 100,
+                child: TextFormField(
+                  controller: _cvvController,
+                  keyboardType: TextInputType.number,
+                  maxLength: 3,
+                  obscureText: true,
+                  decoration: _input("CVV"),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) return "Enter CVV";
+                    if (value.length != 3) return "3 digits";
+                    return null;
+                  },
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  InputDecoration _input(String hint) => InputDecoration(
+    hintText: hint,
+    counterText: "",
+    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+  );
+
+  // ---------------- PAY BUTTON ----------------
+  Widget _payBtn(Color primary, TextTheme text) {
+    return SizedBox(
+      height: 56,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: primary,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+        ),
+        onPressed: _onPayPressed,
+        child: Text(
+          "Pay Now",
+          style: text.bodyLarge!.copyWith(color: Colors.white),
+        ),
+      ),
+    );
+  }
+
+  // ---------------- PAY LOGIC ----------------
   void _onPayPressed() {
-    final method = _selected == PaymentMethod.vodafone
-        ? 'Vodafone Cash'
-        : (_selected == PaymentMethod.visa ? 'VISA' : 'Mastercard');
+    if (!_formKey.currentState!.validate()) return;
+
+    final method = _selected == PaymentMethod.telda
+        ? "Telda"
+        : _selected == PaymentMethod.visa
+        ? "VISA"
+        : "Mastercard";
+    final order = _orderType == OrderType.reservation
+        ? "Reservation"
+        : "Urgent";
 
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('تأكيد الدفع'),
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text("Confirm Payment"),
         content: Text(
-          'المبلغ: ${_amount.toStringAsFixed(0)} جنيه\nطريقة الدفع: $method',
+          "Amount: ${_amount.toStringAsFixed(0)} EGP\nPayment Method: $method\nOrder Type: $order",
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('إلغاء'),
+            onPressed: () => Navigator.of(ctx, rootNavigator: true).pop(),
+            child: const Text("Cancel"),
           ),
-
           ElevatedButton(
             onPressed: () {
-              Navigator.pop(context); // يغلق الحوار
-
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                          InvoicePage(amount: _amount, method: method),
-                ),
-              );
+              Navigator.of(ctx, rootNavigator: true).pop();
+              Future.delayed(const Duration(milliseconds: 150), () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => InvoicePage(
+                      amount: _amount,
+                      method: method,
+                      orderType: order,
+                    ),
+                  ),
+                );
+              });
             },
-            child: const Text('متابعة'),
+            child: const Text("Continue"),
           ),
         ],
       ),
