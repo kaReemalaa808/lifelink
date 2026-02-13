@@ -8,6 +8,7 @@ import 'package:lifelink/screen/blood_Inventory.dart';
 import 'package:lifelink/screen/my_data_page.dart';
 import 'package:lifelink/screen/home_screen.dart';
 import 'package:lifelink/screen/blood_type_page.dart';
+import 'package:lifelink/screen/about_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -30,6 +31,7 @@ class MyApp extends StatelessWidget {
         "loginScreen": (context) => const LoginScreen(),
         "signupScreen": (context) => const SignupScreen(),
         "myData": (context) => const MyDataScreen(),
+        "aboutPage": (context) => const AboutPage(),
         "payNow": (context) => const PayNow(),
         "bloodTypePage": (context) => const BloodTypePage(),
       },
