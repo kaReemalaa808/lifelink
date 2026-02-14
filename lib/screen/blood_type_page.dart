@@ -67,18 +67,19 @@ class _BloodTypePageState extends State<BloodTypePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      // ===== AppBar =====
       appBar: AppBar(
-        automaticallyImplyLeading: false,
+        backgroundColor: const Color(0xFF00A7B3),
+        centerTitle: true,
         title: const Text(
-          'Pick your blood type',
+          "Pick your blood type",
           style: TextStyle(
-            color: Colors.white,
+            fontFamily: "Cairo",
+            fontSize: 26,
             fontWeight: FontWeight.bold,
-            fontSize: 22,
+            color: Colors.white,
           ),
         ),
-        centerTitle: true,
-        backgroundColor: const Color(0xFF00A7B3),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
