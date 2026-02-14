@@ -14,10 +14,17 @@ class MyDataScreen extends StatelessWidget {
       backgroundColor: const Color(0xffF5F6FA),
 
       appBar: AppBar(
-        title: const Text("My Data"),
+        backgroundColor: const Color(0xFF00A7B3),
         centerTitle: true,
-        backgroundColor: const Color(0xffF5F6FA),
-        elevation: 0,
+        title: const Text(
+          "My Data",
+          style: TextStyle(
+            fontFamily: "Cairo",
+            fontSize: 29,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
       ),
 
       body: Padding(

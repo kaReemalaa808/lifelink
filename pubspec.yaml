@@ -67,3 +67,6 @@ flutter:
     - family: Cairo
       fonts:
         - asset: fonts/Cairo-Regular.ttf
+    - family: Amiri
+      fonts:
+        - asset: fonts/Amiri-Regular.ttf

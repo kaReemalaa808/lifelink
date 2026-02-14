@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'Pay_Now.dart';
+import 'package:lifelink/screen/Pay_Now.dart';
 
 class BloodTypePage extends StatefulWidget {
   const BloodTypePage({super.key});
@@ -66,14 +66,13 @@ class _BloodTypePageState extends State<BloodTypePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // ✅ باك جراوند أبيض
+      backgroundColor: Colors.white,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         title: const Text(
           'Pick your blood type',
           style: TextStyle(
             color: Colors.white,
-            fontFamily: "Cairo",
             fontWeight: FontWeight.bold,
             fontSize: 22,
           ),
@@ -85,7 +84,7 @@ class _BloodTypePageState extends State<BloodTypePage> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            /// 🔹 Grid Blood Types
+            /// 🔹 CARDS
             GridView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
@@ -140,59 +139,79 @@ class _BloodTypePageState extends State<BloodTypePage> {
               },
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
 
-            /// 🔹 Hospital Dropdown (كيرف)
-            DropdownButtonFormField<String>(
-              value: selectedHospital,
-              hint: const Text('Select hospital'),
-              decoration: InputDecoration(
-                labelText: 'Hospital',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
-              ),
-              items: selectedBlood == null
-                  ? []
-                  : hospitals[selectedBlood]!
-                        .map((h) => DropdownMenuItem(value: h, child: Text(h)))
-                        .toList(),
-              onChanged: selectedBlood == null
-                  ? null
-                  : (value) => setState(() => selectedHospital = value),
-            ),
-
-            const SizedBox(height: 16),
-
-            /// 🔹 Counter
             Row(
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                IconButton(
-                  onPressed: count > 1 ? () => setState(() => count--) : null,
-                  icon: const Icon(Icons.remove),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 8,
+                /// Hospital Dropdown
+                Expanded(
+                  flex: 3,
+                  child: DropdownButtonFormField<String>(
+                    value: selectedHospital,
+                    hint: const Text('Hospital'),
+                    decoration: InputDecoration(
+                      labelText: 'Hospital',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    items: selectedBlood == null
+                        ? []
+                        : hospitals[selectedBlood]!
+                              .map(
+                                (h) =>
+                                    DropdownMenuItem(value: h, child: Text(h)),
+                              )
+                              .toList(),
+                    onChanged: selectedBlood == null
+                        ? null
+                        : (value) => setState(() => selectedHospital = value),
                   ),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.grey),
-                  ),
-                  child: Text('$count', style: const TextStyle(fontSize: 18)),
                 ),
-                IconButton(
-                  onPressed: () => setState(() => count++),
-                  icon: const Icon(Icons.add),
+
+                const SizedBox(width: 12),
+
+                /// Counter
+                Expanded(
+                  flex: 2,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(
+                        onPressed: count > 1
+                            ? () => setState(() => count--)
+                            : null,
+                        icon: const Icon(Icons.remove),
+                      ),
+                      Container(
+                        width: 40,
+                        height: 40,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: Colors.grey),
+                        ),
+                        child: Text(
+                          '$count',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () => setState(() => count++),
+                        icon: const Icon(Icons.add),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
 
             const SizedBox(height: 16),
 
-            /// 🔹 Date Picker
+            /// 🔹 Receive Date
             InkWell(
               onTap: pickDate,
               child: Container(
@@ -204,7 +223,7 @@ class _BloodTypePageState extends State<BloodTypePage> {
                 ),
                 child: Text(
                   receiveDate == null
-                      ? 'Select receive date'
+                      ? 'Receive Date'
                       : 'Receive Date: ${receiveDate!.day}/${receiveDate!.month}/${receiveDate!.year}',
                   style: const TextStyle(fontSize: 16),
                 ),

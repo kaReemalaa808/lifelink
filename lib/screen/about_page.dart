@@ -8,7 +8,6 @@ class AboutPage extends StatefulWidget {
 }
 
 class _AboutPageState extends State<AboutPage> {
-  // Controllers للـ Leader
   final TextEditingController leaderName = TextEditingController();
   final TextEditingController leaderRole = TextEditingController();
 
@@ -32,7 +31,7 @@ class _AboutPageState extends State<AboutPage> {
           "About LifeLink",
           style: TextStyle(
             fontFamily: "Cairo",
-            fontSize: 26,
+            fontSize: 30,
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
@@ -44,23 +43,26 @@ class _AboutPageState extends State<AboutPage> {
         padding: const EdgeInsets.all(20),
         children: [
           // ===== Logo =====
-          Image.asset("images/logo.png", width: 150),
-          const SizedBox(height: 20),
+          Image.asset("images/logo.png", width: 200, height: 200),
 
-          // ===== App Title =====
+          const SizedBox(height: 10),
+
+          // ===== App Title (تم تغيير الخط إلى Amiri) =====
           const Text(
             "LIFE LINK",
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontFamily: "Cairo",
-              fontSize: 36,
+              fontFamily: "Amiri", // ← الخط الأميري هنا
+              fontSize: 40,
               fontWeight: FontWeight.bold,
               color: Color(0xFF00A7B3),
+              letterSpacing: 2,
             ),
           ),
+
           const SizedBox(height: 25),
 
-          // ===== Project Description (بالعربي) =====
+          // ===== Project Description =====
           const Text(
             "جاءت فكرة تطبيق LifeLink استجابةً لمشكلة مجتمعية هامة "
             "تتمثل في صعوبة إدارة وتوزيع أكياس الدم بين المستشفيات.\n\n"
@@ -77,6 +79,7 @@ class _AboutPageState extends State<AboutPage> {
               color: Colors.black87,
             ),
           ),
+
           const SizedBox(height: 40),
 
           // ===== Leader Card =====
