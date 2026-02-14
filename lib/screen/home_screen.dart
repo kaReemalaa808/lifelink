@@ -1,13 +1,62 @@
 import 'package:flutter/material.dart';
 import 'package:lifelink/screen/blood_type_page.dart';
+import 'package:lifelink/screen/my_data_page.dart';
+import 'package:lifelink/screen/about_page.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  int currentIndex = 1;
+
+  final List<Widget> pages = [
+    const MyDataScreen(),
+    const HomeContent(),
+    const AboutPage(),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: pages[currentIndex],
+
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: currentIndex,
+        selectedItemColor: const Color(0xff1FA5A9),
+        unselectedItemColor: Colors.grey,
+
+        onTap: (index) {
+          setState(() {
+            currentIndex = index;
+          });
+        },
+
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: "My Data"),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+          BottomNavigationBarItem(icon: Icon(Icons.info), label: "About"),
+        ],
+      ),
+    );
+  }
+}
+
+////////////////////////////////////////////////////////////////
+/// ده محتوى الصفحة الرئيسية اللي كان موجود عندك
+////////////////////////////////////////////////////////////////
+
+class HomeContent extends StatelessWidget {
+  const HomeContent({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xffF5F6FA),
+
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
@@ -32,7 +81,6 @@ class HomeScreen extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Column(
           children: [
-            /// الكروت اللي فوق
             Row(
               children: [
                 Expanded(
@@ -44,7 +92,7 @@ class HomeScreen extends StatelessWidget {
                     context,
                     Icons.bloodtype,
                     "حجز أكياس دم",
-                    const BloodTypePage(), // ده اللي هيفتح لما تدوسي على المربع
+                    const BloodTypePage(),
                   ),
                 ),
               ],
@@ -52,7 +100,6 @@ class HomeScreen extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            /// عنوان الجدول
             Container(
               padding: const EdgeInsets.all(12),
               width: double.infinity,
@@ -74,7 +121,6 @@ class HomeScreen extends StatelessWidget {
 
             const SizedBox(height: 10),
 
-            /// الليست
             Expanded(
               child: ListView(
                 children: const [
@@ -95,7 +141,7 @@ class HomeScreen extends StatelessWidget {
                     "يتبرع لـ B-, B+, AB-, AB+",
                     "يستقبل من B-, O-",
                   ),
-                  BloodRow("B+", "يتبرع لـ B+, AB+", "يتبرع من B+, B-, O-"),
+                  BloodRow("B+", "يتبرع لـ B+, AB+", "يستقبل من B+, B-, O-"),
                   BloodRow("AB-", "يتبرع لـ AB-, AB+", "يستقبل من الجميع"),
                   BloodRow("AB+", "يتبرع لـ AB+ فقط", "المستقبل العام"),
                 ],
@@ -104,20 +150,9 @@ class HomeScreen extends StatelessWidget {
           ],
         ),
       ),
-
-      bottomNavigationBar: BottomNavigationBar(
-        selectedItemColor: const Color(0xff1FA5A9),
-        unselectedItemColor: Colors.grey,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: ""),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: ""),
-          BottomNavigationBarItem(icon: Icon(Icons.settings), label: ""),
-        ],
-      ),
     );
   }
 
-  /// الكارد اللي فوق (لينك)
   Widget topCard(
     BuildContext context,
     IconData icon,
@@ -141,13 +176,6 @@ class HomeScreen extends StatelessWidget {
             colors: [Color(0xff27B4B8), Color(0xff1FA5A9)],
           ),
           borderRadius: BorderRadius.circular(18),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.teal.withOpacity(.2),
-              blurRadius: 10,
-              offset: const Offset(0, 6),
-            ),
-          ],
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -169,7 +197,8 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-/// الصف بتاع فصيلة الدم
+////////////////////////////////////////////////////////////////
+
 class BloodRow extends StatelessWidget {
   final String type;
   final String donate;
@@ -188,7 +217,6 @@ class BloodRow extends StatelessWidget {
       ),
       child: Row(
         children: [
-          /// الدائرة
           Container(
             width: 45,
             height: 45,
@@ -209,7 +237,6 @@ class BloodRow extends StatelessWidget {
 
           const SizedBox(width: 12),
 
-          /// النصوص
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
