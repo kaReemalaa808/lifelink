@@ -1,80 +1,513 @@
 import 'package:flutter/material.dart';
 
-class AboutPage extends StatelessWidget {
+class AboutPage extends StatefulWidget {
   const AboutPage({super.key});
+
+  @override
+  State<AboutPage> createState() => _AboutPageState();
+}
+
+class _AboutPageState extends State<AboutPage> {
+  // Controllers للـ Leader
+  final TextEditingController leaderName = TextEditingController();
+  final TextEditingController leaderRole = TextEditingController();
+
+  @override
+  void dispose() {
+    leaderName.dispose();
+    leaderRole.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[100],
+
+      // ===== AppBar =====
       appBar: AppBar(
+        backgroundColor: const Color(0xFF00A7B3),
+        centerTitle: true,
         title: const Text(
-          "About",
-          style: TextStyle(fontWeight: FontWeight.bold),
+          "About LifeLink",
+          style: TextStyle(
+            fontFamily: "Cairo",
+            fontSize: 26,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
         ),
-        backgroundColor: Colors.red,
       ),
-      body: SingleChildScrollView(
+
+      // ===== Body =====
+      body: ListView(
         padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const SizedBox(height: 20),
+        children: [
+          // ===== Logo =====
+          Image.asset("images/logo.png", width: 150),
+          const SizedBox(height: 20),
 
-            // 🔴 أيقونة التطبيق
-            CircleAvatar(
-              radius: 50,
-              backgroundColor: Colors.red.shade100,
-              child: const Icon(Icons.bloodtype, size: 60, color: Colors.red),
+          // ===== App Title =====
+          const Text(
+            "LIFE LINK",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontFamily: "Cairo",
+              fontSize: 36,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF00A7B3),
             ),
+          ),
+          const SizedBox(height: 25),
 
-            const SizedBox(height: 20),
+          // ===== Project Description (بالعربي) =====
+          const Text(
+            "جاءت فكرة تطبيق LifeLink استجابةً لمشكلة مجتمعية هامة "
+            "تتمثل في صعوبة إدارة وتوزيع أكياس الدم بين المستشفيات.\n\n"
+            "تعاني بعض المستشفيات من نقص حاد في فصائل معينة، "
+            "بينما تمتلك مستشفيات أخرى فائضًا غير مستغل.\n\n"
+            "لذلك قمنا بتصميم نظام ذكي يهدف إلى تنظيم، متابعة، "
+            "وإدارة مخزون أكياس الدم بشكل دقيق وفعّال، "
+            "مما يضمن سرعة الاستجابة وتقليل الهدر وتحقيق التكامل بين الجهات الطبية.",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontFamily: "Amiri",
+              fontSize: 18,
+              height: 1.6,
+              color: Colors.black87,
+            ),
+          ),
+          const SizedBox(height: 40),
 
-            const Text(
-              "LifeLink",
-              style: TextStyle(
-                fontSize: 26,
-                fontWeight: FontWeight.bold,
-                color: Colors.red,
+          // ===== Leader Card =====
+          Card(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
+            elevation: 4,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: const [
+                  Icon(Icons.star, color: Color(0xFF00A7B3), size: 30),
+                  SizedBox(width: 12),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Team Leader",
+                        style: TextStyle(
+                          fontFamily: "Cairo",
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF00A7B3),
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        "Name: كريم علاء الدين محمد بكري",
+                        style: TextStyle(fontFamily: "Cairo", fontSize: 16),
+                      ),
+                      Text(
+                        "Role: Flutter Developer & tester &\n Project Manager",
+                        style: TextStyle(fontFamily: "Cairo", fontSize: 16),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
+          ),
+          const SizedBox(height: 40),
 
-            const SizedBox(height: 10),
-
-            const Text(
-              "تطبيق لإدارة التبرع بالدم وتنظيم مخزون أكياس الدم بين المستشفيات.",
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 16),
+          // ===== Members Cards =====
+          Card(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
             ),
-
-            const SizedBox(height: 30),
-
-            Divider(color: Colors.grey.shade300),
-
-            const SizedBox(height: 20),
-
-            ListTile(
-              leading: const Icon(Icons.person, color: Colors.red),
-              title: const Text("Developer"),
-              subtitle: const Text("كريم - Flutter Developer"),
+            elevation: 4,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: const [
+                  Icon(
+                    Icons.person_outline,
+                    color: Color(0xFF00A7B3),
+                    size: 30,
+                  ),
+                  SizedBox(width: 12),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Member 1",
+                        style: TextStyle(
+                          fontFamily: "Cairo",
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF00A7B3),
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        "Name: فريد ناجي فريد كامل ميخائيل",
+                        style: TextStyle(fontFamily: "Cairo", fontSize: 16),
+                      ),
+                      Text(
+                        "Role: Flutter Developer",
+                        style: TextStyle(fontFamily: "Cairo", fontSize: 16),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
+          ),
 
-            ListTile(
-              leading: const Icon(Icons.email, color: Colors.red),
-              title: const Text("Email"),
-              subtitle: const Text("lifelink@example.com"),
+          Card(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
             ),
-
-            ListTile(
-              leading: const Icon(Icons.phone, color: Colors.red),
-              title: const Text("Phone"),
-              subtitle: const Text("+20 123 456 7890"),
+            elevation: 4,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: const [
+                  Icon(
+                    Icons.person_outline,
+                    color: Color(0xFF00A7B3),
+                    size: 30,
+                  ),
+                  SizedBox(width: 12),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Member 2",
+                        style: TextStyle(
+                          fontFamily: "Cairo",
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF00A7B3),
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        "Name: محمود ياسر محمود سيد",
+                        style: TextStyle(fontFamily: "Cairo", fontSize: 16),
+                      ),
+                      Text(
+                        "Role: Backend Developer",
+                        style: TextStyle(fontFamily: "Cairo", fontSize: 16),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
+          ),
 
-            const SizedBox(height: 40),
+          Card(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
+            elevation: 4,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: const [
+                  Icon(
+                    Icons.person_outline,
+                    color: Color(0xFF00A7B3),
+                    size: 30,
+                  ),
+                  SizedBox(width: 12),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Member 3",
+                        style: TextStyle(
+                          fontFamily: "Cairo",
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF00A7B3),
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        "Name: اسماء عمرو محمد طه",
+                        style: TextStyle(fontFamily: "Cairo", fontSize: 16),
+                      ),
+                      Text(
+                        "Role: Backend Developer",
+                        style: TextStyle(fontFamily: "Cairo", fontSize: 16),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
 
-            const Text("Version 1.0.0", style: TextStyle(color: Colors.grey)),
-          ],
-        ),
+          Card(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
+            elevation: 4,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: const [
+                  Icon(
+                    Icons.person_outline,
+                    color: Color(0xFF00A7B3),
+                    size: 30,
+                  ),
+                  SizedBox(width: 12),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Member 4",
+                        style: TextStyle(
+                          fontFamily: "Cairo",
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF00A7B3),
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        "Name: رفقة كمال رياض",
+                        style: TextStyle(fontFamily: "Cairo", fontSize: 16),
+                      ),
+                      Text(
+                        "Role: Flutter Developer",
+                        style: TextStyle(fontFamily: "Cairo", fontSize: 16),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          Card(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
+            elevation: 4,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: const [
+                  Icon(
+                    Icons.person_outline,
+                    color: Color(0xFF00A7B3),
+                    size: 30,
+                  ),
+                  SizedBox(width: 12),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Member 5",
+                        style: TextStyle(
+                          fontFamily: "Cairo",
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF00A7B3),
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        "Name: منتصر كرم ابو النجا سليمان",
+                        style: TextStyle(fontFamily: "Cairo", fontSize: 16),
+                      ),
+                      Text(
+                        "Role: Backend Developer",
+                        style: TextStyle(fontFamily: "Cairo", fontSize: 16),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          Card(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
+            elevation: 4,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: const [
+                  Icon(
+                    Icons.person_outline,
+                    color: Color(0xFF00A7B3),
+                    size: 30,
+                  ),
+                  SizedBox(width: 12),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Member 6",
+                        style: TextStyle(
+                          fontFamily: "Cairo",
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF00A7B3),
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        "Name: سهيله حسن علي حسن",
+                        style: TextStyle(fontFamily: "Cairo", fontSize: 16),
+                      ),
+                      Text(
+                        "Role: Ui/UX Designer",
+                        style: TextStyle(fontFamily: "Cairo", fontSize: 16),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          Card(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
+            elevation: 4,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: const [
+                  Icon(
+                    Icons.person_outline,
+                    color: Color(0xFF00A7B3),
+                    size: 30,
+                  ),
+                  SizedBox(width: 12),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Member 7",
+                        style: TextStyle(
+                          fontFamily: "Cairo",
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF00A7B3),
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        "Name: تقى هشام احمد حسن",
+                        style: TextStyle(fontFamily: "Cairo", fontSize: 16),
+                      ),
+                      Text(
+                        "Role: Text project book",
+                        style: TextStyle(fontFamily: "Cairo", fontSize: 16),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          Card(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
+            elevation: 4,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: const [
+                  Icon(
+                    Icons.person_outline,
+                    color: Color(0xFF00A7B3),
+                    size: 30,
+                  ),
+                  SizedBox(width: 12),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Member 8",
+                        style: TextStyle(
+                          fontFamily: "Cairo",
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF00A7B3),
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        "Name: سلمى محمود عرفان احمد",
+                        style: TextStyle(fontFamily: "Cairo", fontSize: 16),
+                      ),
+                      Text(
+                        "Role: Text project book",
+                        style: TextStyle(fontFamily: "Cairo", fontSize: 16),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          Card(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
+            elevation: 4,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: const [
+                  Icon(
+                    Icons.person_outline,
+                    color: Color(0xFF00A7B3),
+                    size: 30,
+                  ),
+                  SizedBox(width: 12),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Member 9",
+                        style: TextStyle(
+                          fontFamily: "Cairo",
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF00A7B3),
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        "Name: احمد سيد محمد عمار",
+                        style: TextStyle(fontFamily: "Cairo", fontSize: 16),
+                      ),
+                      Text(
+                        "Role: Text project book",
+                        style: TextStyle(fontFamily: "Cairo", fontSize: 16),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
