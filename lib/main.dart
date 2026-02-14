@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: const MyDataScreen(),
+      home: const HomeScreen(),
       routes: {
         "admin": (context) => const AdminPage(),
         "homeScreen": (context) => const HomeScreen(),
