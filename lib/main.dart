@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 //import 'package:lifelink/auth.dart';
 import 'package:lifelink/screen/login_screen.dart';
 import 'package:lifelink/screen/signup_screen.dart';
-import 'package:lifelink/screen/Pay_Now.dart';
 import 'package:lifelink/screen/admin.dart';
 import 'package:lifelink/screen/blood_Inventory.dart';
 import 'package:lifelink/screen/my_data_page.dart';
 import 'package:lifelink/screen/home_screen.dart';
 import 'package:lifelink/screen/blood_type_page.dart';
 import 'package:lifelink/screen/about_page.dart';
+// import 'package:lifelink/screen/Pay_Now.dart';
+import 'package:lifelink/screen/delivery_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,7 +18,6 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -32,8 +32,9 @@ class MyApp extends StatelessWidget {
         "signupScreen": (context) => const SignupScreen(),
         "myData": (context) => const MyDataScreen(),
         "aboutPage": (context) => const AboutPage(),
-        "payNow": (context) => const PayNow(),
         "bloodTypePage": (context) => const BloodTypePage(),
+        // "payNow": (context) => const PayNowPage(),
+        "deliverypage": (context) => const DeliveryPage(),
       },
     );
   }
