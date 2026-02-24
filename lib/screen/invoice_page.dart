@@ -8,6 +8,10 @@ class InvoicePage extends StatelessWidget {
   final String hospital;
   final int quantity;
   final DateTime receiveDate;
+  final String? deliveryAddress;
+  final String? deliveryName;
+  final String? deliveryPhone;
+  final String? notes;
 
   const InvoicePage({
     super.key,
@@ -18,6 +22,10 @@ class InvoicePage extends StatelessWidget {
     required this.hospital,
     required this.quantity,
     required this.receiveDate,
+    this.deliveryAddress,
+    this.deliveryName,
+    this.deliveryPhone,
+    this.notes,
   });
 
   @override
@@ -35,9 +43,10 @@ class InvoicePage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 1,
-        title: const Text("Invoice"),
+        title: const Text("Invoice", style: TextStyle(color: Colors.black)),
         automaticallyImplyLeading: false,
       ),
+
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -60,6 +69,7 @@ class InvoicePage extends StatelessWidget {
                 children: [
                   Icon(Icons.receipt_long, size: 50, color: primary),
                   const SizedBox(height: 12),
+
                   Text(
                     "Payment Successful",
                     style: TextStyle(
@@ -68,6 +78,7 @@ class InvoicePage extends StatelessWidget {
                       color: primary,
                     ),
                   ),
+
                   const SizedBox(height: 6),
                   const Text(
                     "Thank you for using Lifelink",
@@ -89,19 +100,26 @@ class InvoicePage extends StatelessWidget {
             _invoiceItem("Blood Type", bloodType),
             _invoiceItem("Hospital", hospital),
             _invoiceItem("Quantity", quantity.toString()),
+            if (deliveryAddress != null)
+              _invoiceItem("Delivery Address", deliveryAddress!),
             _invoiceItem("Amount Paid", "${amount.toStringAsFixed(2)} EGP"),
             _invoiceItem("Status", "Successful", highlight: true),
 
+            const SizedBox(height: 20),
+
+            if (deliveryName != null)
+              _invoiceItem("Delivery Name", deliveryName!),
+            if (deliveryPhone != null)
+              _invoiceItem("Delivery Phone", deliveryPhone!),
+            if (notes != null) _invoiceItem("Notes", notes!),
+
             const SizedBox(height: 30),
 
-            // زر الرجوع
             SizedBox(
               width: double.infinity,
               height: 55,
               child: ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
+                onPressed: () => Navigator.pop(context),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.white,
                   side: BorderSide(color: primary, width: 2),
@@ -124,14 +142,11 @@ class InvoicePage extends StatelessWidget {
 
             const SizedBox(height: 16),
 
-            // زر PDF
             SizedBox(
               width: double.infinity,
               height: 55,
               child: ElevatedButton.icon(
-                onPressed: () {
-                  // ربط وظيفة PDF لاحقًا
-                },
+                onPressed: () {},
                 icon: const Icon(Icons.picture_as_pdf, color: Colors.white),
                 label: const Text(
                   "Download PDF",
@@ -143,7 +158,6 @@ class InvoicePage extends StatelessWidget {
                     borderRadius: BorderRadius.circular(16),
                   ),
                   elevation: 5,
-                  shadowColor: Colors.black45,
                 ),
               ),
             ),
@@ -169,19 +183,20 @@ class InvoicePage extends StatelessWidget {
           ),
         ],
       ),
+
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            title,
-            style: const TextStyle(fontSize: 16, color: Colors.black87),
-          ),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: highlight ? Colors.green : Colors.black87,
+          Text(title, style: const TextStyle(fontSize: 16)),
+          Flexible(
+            child: Text(
+              value,
+              textAlign: TextAlign.end,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: highlight ? Colors.green : Colors.black87,
+              ),
             ),
           ),
         ],

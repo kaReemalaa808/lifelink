@@ -61,7 +61,6 @@ class _BloodTypePageState extends State<BloodTypePage> {
   Widget build(BuildContext context) {
     const primaryColor = Color(0xFF00A7B3);
 
-    // دالة الصندوق الموحد مع ظل خفيف
     BoxDecoration boxDecoration({bool selected = false}) => BoxDecoration(
       color: selected ? primaryColor : Colors.white,
       borderRadius: BorderRadius.circular(14),
@@ -80,7 +79,6 @@ class _BloodTypePageState extends State<BloodTypePage> {
       appBar: AppBar(
         backgroundColor: primaryColor,
         centerTitle: true,
-        automaticallyImplyLeading: false,
         title: const Text(
           "Pick your blood type",
           style: TextStyle(
@@ -95,7 +93,6 @@ class _BloodTypePageState extends State<BloodTypePage> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            // فصائل الدم
             GridView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
@@ -143,10 +140,7 @@ class _BloodTypePageState extends State<BloodTypePage> {
                 );
               },
             ),
-
             const SizedBox(height: 24),
-
-            // اختيار المستشفى + العداد
             Row(
               children: [
                 Expanded(
@@ -190,7 +184,6 @@ class _BloodTypePageState extends State<BloodTypePage> {
                   ),
                 ),
                 const SizedBox(width: 12),
-
                 Expanded(
                   flex: 2,
                   child: Container(
@@ -225,10 +218,7 @@ class _BloodTypePageState extends State<BloodTypePage> {
                 ),
               ],
             ),
-
             const SizedBox(height: 16),
-
-            // تاريخ الاستلام
             InkWell(
               onTap: pickDate,
               child: Container(
@@ -243,10 +233,7 @@ class _BloodTypePageState extends State<BloodTypePage> {
                 ),
               ),
             ),
-
-            const Spacer(),
-
-            // زر الانتقال لصفحة الدفع
+            const SizedBox(height: 20),
             SizedBox(
               width: double.infinity,
               height: 50,
@@ -272,6 +259,7 @@ class _BloodTypePageState extends State<BloodTypePage> {
                               hospital: selectedHospital!,
                               quantity: count,
                               receiveDate: receiveDate!,
+                              orderType: "Pickup",
                             ),
                           ),
                         );
