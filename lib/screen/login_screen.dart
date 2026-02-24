@@ -18,7 +18,7 @@ class _LoginScreenState extends State<LoginScreen> {
     //    await FirebaseAuth.instance.signInWithEmailAndPassword(
     //    email: _emailController.text.trim(),
     //  password: _passwordController.text.trim(),
-    //);
+    // );
     if (_emailController.text.contains('admin')) {
       openAdmin();
     } else if (_emailController.text.contains('homeScreen')) {
@@ -72,8 +72,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
               //image
               children: [
-                Image.asset("images/logo.png", width: 250.0, height: 250.0),
-                //Title
+                  Image.asset("images/logo.png", width: 250.0, height: 250.0),
+                  //Title
                 Text(
                   "LIFE LINK",
                   style: TextStyle(
@@ -141,15 +141,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child: GestureDetector(
-                    onTap: openHomeScreen,
-                    () {
+                    onTap: () {
                       if (_emailController.text.isEmpty ||
                           _passwordController.text.isEmpty) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text("Please fill in all fields")),
                         );
-                      } else {
-                        HomeScreen();
                       }
                     },
                     child: Container(

@@ -10,6 +10,7 @@ import 'package:lifelink/screen/blood_type_page.dart';
 import 'package:lifelink/screen/about_page.dart';
 // import 'package:lifelink/screen/Pay_Now.dart';
 import 'package:lifelink/screen/delivery_page.dart';
+import 'package:lifelink/screen/ScaleDemo.dart';
 
 void main() {
   runApp(const MyApp());
@@ -23,8 +24,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: const HomeScreen(),
+      home: const ScaleDemo(), // Use ScaleDemo as the home screen
       routes: {
+        "scaleDemo": (context) => const ScaleDemo(),
         "admin": (context) => const AdminPage(),
         "homeScreen": (context) => const HomeScreen(),
         "bloodInventoryAdmin": (context) => const BloodInventoryAdminPage(),
