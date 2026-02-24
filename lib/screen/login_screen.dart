@@ -142,16 +142,16 @@ class _LoginScreenState extends State<LoginScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child: GestureDetector(
                     onTap: openHomeScreen,
-                    // () {
-                    //   if (_emailController.text.isEmpty ||
-                    //       _passwordController.text.isEmpty) {
-                    //     ScaffoldMessenger.of(context).showSnackBar(
-                    //       SnackBar(content: Text("Please fill in all fields")),
-                    //     );
-                    //   } else {
-                    //     HomeScreen();
-                    //   }
-                    // },
+                    () {
+                      if (_emailController.text.isEmpty ||
+                          _passwordController.text.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text("Please fill in all fields")),
+                        );
+                      } else {
+                        HomeScreen();
+                      }
+                    },
                     child: Container(
                       padding: EdgeInsets.all(16.0),
                       decoration: BoxDecoration(
