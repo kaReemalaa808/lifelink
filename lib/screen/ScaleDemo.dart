@@ -62,14 +62,14 @@ class _IntroScreenState extends State<IntroScreen>
     /// تحريك اللوجو لفوق
     _logoMoveUp = Tween<double>(
       begin: 0,
-      end: -35,
+      end: -15,
     ).animate(CurvedAnimation(parent: _textController, curve: Curves.easeOut));
 
     /// ظهور النص تدريجي
     _textOpacity = Tween<double>(begin: 0, end: 1).animate(_textController);
 
     /// النص قريب مش بعيد
-    _textMoveUp = Tween<double>(begin: 15, end: 0).animate(_textController);
+    _textMoveUp = Tween<double>(begin: 10, end: 0).animate(_textController);
 
     startAnimation();
   }
