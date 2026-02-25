@@ -24,9 +24,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: const ScaleDemo(), // Use ScaleDemo as the home screen
+      home: const IntroScreen(), // Use ScaleDemo as the home screen
       routes: {
-        "scaleDemo": (context) => const ScaleDemo(),
+        "IntroScreen": (context) => const IntroScreen(),
         "admin": (context) => const AdminPage(),
         "homeScreen": (context) => const HomeScreen(),
         "bloodInventoryAdmin": (context) => const BloodInventoryAdminPage(),

@@ -1,87 +1,145 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
-//import 'package:audioplayers/audioplayers.dart';
-import 'login_screen.dart'; // استدعي شاشة اللوجين
+import 'dart:async';
+import 'package:lifelink/screen/login_screen.dart';
 
-class ScaleDemo extends StatefulWidget {
-  const ScaleDemo({super.key});
+class IntroScreen extends StatefulWidget {
+  const IntroScreen({super.key});
 
   @override
-  State<ScaleDemo> createState() => _ScaleDemoState();
+  State<IntroScreen> createState() => _IntroScreenState();
 }
 
-class _ScaleDemoState extends State<ScaleDemo>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller; // مسؤول عن تشغيل الأنيميشن
-  late Animation<double> _animation; // قيمة التكبير
+class _IntroScreenState extends State<IntroScreen>
+    with TickerProviderStateMixin {
+  late AnimationController _logoController;
+  late AnimationController _textController;
 
-  //  final AudioPlayer _player = AudioPlayer(); // مشغل الصوت
+  late Animation<double> _logoScale;
+  late Animation<double> _logoOpacity;
+  late Animation<double> _logoMoveUp;
+
+  late Animation<double> _textOpacity;
+  late Animation<double> _textMoveUp;
 
   @override
   void initState() {
     super.initState();
 
-    // إنشاء AnimationController
-    _controller = AnimationController(
+    _logoController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 800), // مدة الأنيميشن
+      duration: const Duration(milliseconds: 1400),
     );
 
-    // تحديد حركة التكبير من 0 → 1 (يظهر تدريجياً)
-    _animation =
-        Tween<double>(
-          begin: 0.0, // يبدأ من غير حجم (مختفي)
-          end: 1.0, // يصل للحجم الطبيعي
-        ).animate(
-          CurvedAnimation(
-            parent: _controller,
-            curve: Curves.elasticOut, // bounce effect
-          ),
-        );
+    _textController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
 
-    // تشغيل الصوت + الأنيميشن بعد تحميل الشاشة
-    _startAnimation();
+    /// تكبير اللوجو + رجوعه طبيعي
+    _logoScale = TweenSequence([
+      TweenSequenceItem(
+        tween: Tween(
+          begin: 0.0,
+          end: 1.3,
+        ).chain(CurveTween(curve: Curves.easeOut)),
+        weight: 60,
+      ),
+      TweenSequenceItem(
+        tween: Tween(
+          begin: 1.3,
+          end: 1.0,
+        ).chain(CurveTween(curve: Curves.elasticOut)),
+        weight: 40,
+      ),
+    ]).animate(_logoController);
 
-    // بعد انتهاء الأنيميشن → الانتقال للوجين
-    Timer(const Duration(milliseconds: 1600), () {
+    /// إخفاء و إظهار تدريجي
+    _logoOpacity = Tween<double>(
+      begin: 0,
+      end: 1,
+    ).animate(CurvedAnimation(parent: _logoController, curve: Curves.easeIn));
+
+    /// تحريك اللوجو لفوق
+    _logoMoveUp = Tween<double>(
+      begin: 0,
+      end: -35,
+    ).animate(CurvedAnimation(parent: _textController, curve: Curves.easeOut));
+
+    /// ظهور النص تدريجي
+    _textOpacity = Tween<double>(begin: 0, end: 1).animate(_textController);
+
+    /// النص قريب مش بعيد
+    _textMoveUp = Tween<double>(begin: 15, end: 0).animate(_textController);
+
+    startAnimation();
+  }
+
+  void startAnimation() async {
+    await _logoController.forward();
+    await _textController.forward();
+
+    Future.delayed(const Duration(seconds: 2), () {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const LoginScreen()),
+        MaterialPageRoute(builder: (_) => const LoginScreen()),
       );
     });
   }
 
-  // تشغيل الصوت والأنيميشن
-  Future<void> _startAnimation() async {
-    // تشغيل الصوت
-    //  await _player.play(AssetSource('sounds/pop.mp3'));
-
-    // تشغيل الأنيميشن
-    _controller.forward();
-  }
-
   @override
   void dispose() {
-    _controller.dispose();
-    //_player.dispose();
+    _logoController.dispose();
+    _textController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    // هنا نقرأ وضع الجهاز مباشرة
+    final deviceBrightness = MediaQuery.of(context).platformBrightness;
+    final isDark = deviceBrightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
-
+      backgroundColor: isDark ? Colors.black : Colors.white,
       body: Center(
-        // ScaleTransition مسؤول عن تكبير اللوجو
-        child: ScaleTransition(
-          scale: _animation,
+        child: AnimatedBuilder(
+          animation: Listenable.merge([_logoController, _textController]),
+          builder: (context, child) {
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                /// اللوجو
+                Transform.translate(
+                  offset: Offset(0, _logoMoveUp.value),
+                  child: Opacity(
+                    opacity: _logoOpacity.value,
+                    child: Transform.scale(
+                      scale: _logoScale.value,
+                      child: Image.asset("images/logo.png", width: 250),
+                    ),
+                  ),
+                ),
 
-          child: Image.asset(
-            "images/logo.png",
-            // حط هنا اللوجو بتاعك
-            width: 300,
-          ),
+                const SizedBox(height: 0),
+
+                /// اسم التطبيق
+                Opacity(
+                  opacity: _textOpacity.value,
+                  child: Transform.translate(
+                    offset: Offset(0, _textMoveUp.value),
+                    child: Text(
+                      "Life Link",
+                      style: TextStyle(
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.white : Colors.black,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
