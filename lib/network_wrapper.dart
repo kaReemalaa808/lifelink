@@ -64,7 +64,7 @@ class _NetworkWrapperState extends State<NetworkWrapper> {
         content: Text(
           isOnline
               ? "✅ Internet connection restored"
-              : "❌ No Internet Connection",
+              : "❌. No Internet Connection",
           style: const TextStyle(
             fontFamily: "Cairo", // نفس الخط اللي في مشروعك
             fontWeight: FontWeight.bold,
