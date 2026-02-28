@@ -200,7 +200,7 @@ class _AboutPageState extends State<AboutPage> {
                         style: TextStyle(fontFamily: "Cairo", fontSize: 16),
                       ),
                       Text(
-                        "Role: Backend Developer",
+                        "Role: Backend r",
                         style: TextStyle(fontFamily: "Cairo", fontSize: 16),
                       ),
                     ],
@@ -243,7 +243,7 @@ class _AboutPageState extends State<AboutPage> {
                         style: TextStyle(fontFamily: "Cairo", fontSize: 16),
                       ),
                       Text(
-                        "Role: Backend Developer",
+                        "Role: Backend ",
                         style: TextStyle(fontFamily: "Cairo", fontSize: 16),
                       ),
                     ],
@@ -329,7 +329,7 @@ class _AboutPageState extends State<AboutPage> {
                         style: TextStyle(fontFamily: "Cairo", fontSize: 16),
                       ),
                       Text(
-                        "Role: Backend Developer",
+                        "Role: Backend ",
                         style: TextStyle(fontFamily: "Cairo", fontSize: 16),
                       ),
                     ],

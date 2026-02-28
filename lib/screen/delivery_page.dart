@@ -85,6 +85,7 @@ class _DeliveryPageState extends State<DeliveryPage> {
       appBar: AppBar(
         backgroundColor: primaryColor,
         centerTitle: true,
+        automaticallyImplyLeading: false,
         title: const Text(
           "Delivery Details",
           style: TextStyle(

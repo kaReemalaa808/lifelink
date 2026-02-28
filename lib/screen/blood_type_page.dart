@@ -79,6 +79,7 @@ class _BloodTypePageState extends State<BloodTypePage> {
       appBar: AppBar(
         backgroundColor: primaryColor,
         centerTitle: true,
+        automaticallyImplyLeading: false,
         title: const Text(
           "Pick your blood type",
           style: TextStyle(

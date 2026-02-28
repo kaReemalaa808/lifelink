@@ -1,8 +1,76 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:lifelink/internet_service.dart';
 import 'invoice_page.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 
 const Color primaryColor = Color(0xFF00A7B3);
 
+/// ==========================
+/// Network Wrapper
+/// ==========================
+class NetworkWrapper extends StatefulWidget {
+  final Widget child;
+  const NetworkWrapper({super.key, required this.child});
+
+  @override
+  State<NetworkWrapper> createState() => _NetworkWrapperState();
+}
+
+class _NetworkWrapperState extends State<NetworkWrapper> {
+  bool hasInternet = true;
+  StreamSubscription? connectivitySubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkInternet();
+
+    connectivitySubscription = Connectivity().onConnectivityChanged.listen((
+      event,
+    ) async {
+      bool isConnected = await InternetConnectionChecker().hasConnection;
+
+      if (isConnected != hasInternet) {
+        hasInternet = isConnected;
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                hasInternet
+                    ? "✅ Internet connection restored"
+                    : "❌ No Internet Connection",
+              ),
+              backgroundColor: hasInternet ? Colors.green : Colors.red,
+              duration: const Duration(seconds: 3),
+            ),
+          );
+        }
+      }
+    });
+  }
+
+  Future<void> _checkInternet() async {
+    hasInternet = await InternetConnectionChecker().hasConnection;
+  }
+
+  @override
+  void dispose() {
+    connectivitySubscription?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return widget.child;
+  }
+}
+
+/// ==========================
+/// PayNow Page
+/// ==========================
 class PayNow extends StatelessWidget {
   final String bloodType;
   final String hospital;
@@ -25,30 +93,37 @@ class PayNow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        useMaterial3: true,
-        brightness: Brightness.light,
-        fontFamily: 'Tajawal',
-        scaffoldBackgroundColor: const Color(0xFFF7F7F8),
-        colorScheme: ColorScheme.fromSeed(seedColor: primaryColor),
-      ),
-      home: Directionality(
-        textDirection: TextDirection.ltr,
-        child: PaymentScreen(
-          bloodType: bloodType,
-          hospital: hospital,
-          quantity: quantity,
-          receiveDate: receiveDate,
-          orderType: orderType,
-          deliveryAddress: deliveryAddress,
-          deliveryFee: deliveryFee,
+    return NetworkWrapper(
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          useMaterial3: true,
+          brightness: Brightness.light,
+          fontFamily: 'Tajawal',
+          scaffoldBackgroundColor: const Color(0xFFF7F7F8),
+          colorScheme: ColorScheme.fromSeed(seedColor: primaryColor),
+        ),
+        home: Directionality(
+          textDirection: TextDirection.ltr,
+          child: PaymentScreen(
+            bloodType: bloodType,
+            hospital: hospital,
+            quantity: quantity,
+            receiveDate: receiveDate,
+            orderType: orderType,
+            deliveryAddress: deliveryAddress,
+            deliveryFee: deliveryFee,
+          ),
         ),
       ),
     );
   }
 }
+
+// ==========================
+// PaymentScreen & Logic
+// ==========================
+enum PaymentMethod { telda, visa, mastercard }
 
 class PaymentScreen extends StatefulWidget {
   final String bloodType;
@@ -74,11 +149,8 @@ class PaymentScreen extends StatefulWidget {
   State<PaymentScreen> createState() => _PaymentScreenState();
 }
 
-enum PaymentMethod { telda, visa, mastercard }
-
 class _PaymentScreenState extends State<PaymentScreen> {
   PaymentMethod _selected = PaymentMethod.telda;
-
   final double _amountPerBag = 200.0;
   final _formKey = GlobalKey<FormState>();
 
@@ -88,43 +160,33 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
   double get totalAmount {
     double total = _amountPerBag * widget.quantity;
-    if (widget.deliveryFee != null) {
-      total += widget.deliveryFee!;
-    }
+    if (widget.deliveryFee != null) total += widget.deliveryFee!;
     return total;
   }
 
   @override
   void initState() {
     super.initState();
-    // إضافة مستمعين للتنسيق التلقائي
     _cardNumber.addListener(_formatCardNumber);
     _expiry.addListener(_formatExpiryDate);
   }
 
   @override
   void dispose() {
-    _cardNumber.removeListener(_formatCardNumber);
-    _expiry.removeListener(_formatExpiryDate);
     _cardNumber.dispose();
     _expiry.dispose();
     _cvv.dispose();
     super.dispose();
   }
 
-  // دالة تنسيق رقم البطاقة (إضافة مسافة كل 4 أرقام)
   void _formatCardNumber() {
-    String text = _cardNumber.text.replaceAll(RegExp(r'\s+\b|\b\s'), '');
+    String text = _cardNumber.text.replaceAll(RegExp(r'\s+'), '');
     if (text.isEmpty) return;
-
     String formatted = '';
     for (int i = 0; i < text.length; i++) {
-      if (i > 0 && i % 4 == 0) {
-        formatted += ' ';
-      }
+      if (i > 0 && i % 4 == 0) formatted += ' ';
       formatted += text[i];
     }
-
     if (_cardNumber.text != formatted) {
       _cardNumber.value = TextEditingValue(
         text: formatted,
@@ -133,27 +195,18 @@ class _PaymentScreenState extends State<PaymentScreen> {
     }
   }
 
-  // دالة تنسيق تاريخ الانتهاء (إضافة / بعد الشهر)
   void _formatExpiryDate() {
     String text = _expiry.text.replaceAll(RegExp(r'[^\d]'), '');
     if (text.isEmpty) return;
-
     if (text.length >= 3) {
       String month = text.substring(0, 2);
       String year = text.substring(2, text.length > 4 ? 4 : text.length);
-
-      // التأكد من أن الشهر بين 01 و 12
-      if (month.isNotEmpty) {
-        int monthInt = int.parse(month);
-        if (monthInt > 12) {
-          month = '12';
-        } else if (monthInt < 1 && month.length == 2) {
-          month = '01';
-        }
-      }
-
+      int monthInt = int.tryParse(month) ?? 1;
+      if (monthInt > 12) {
+        month = '12';
+      } else if (monthInt < 1 && month.length == 2)
+        month = '01';
       String formatted = text.length >= 2 ? '$month/$year' : text;
-
       if (_expiry.text != formatted) {
         _expiry.value = TextEditingValue(
           text: formatted,
@@ -161,89 +214,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
         );
       }
     }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final text = Theme.of(context).textTheme;
-
-    return Scaffold(
-      appBar: AppBar(
-        elevation: 1,
-        backgroundColor: primaryColor,
-        automaticallyImplyLeading: false,
-        title: Row(
-          children: [
-            Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(9),
-              ),
-              child: Icon(Icons.bloodtype, color: primaryColor),
-            ),
-            const SizedBox(width: 10),
-            Text(
-              "Lifelink",
-              style: text.titleLarge!.copyWith(color: Colors.white),
-            ),
-          ],
-        ),
-      ),
-
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text("Payment", style: text.displayMedium),
-            const SizedBox(height: 15),
-
-            _summaryCard(text),
-            const SizedBox(height: 25),
-
-            Text("Payment Method", style: text.titleMedium),
-            const SizedBox(height: 10),
-
-            _paymentTile(
-              title: "Telda",
-              subtitle: "Fast & secure",
-              icon: Image.asset("images/01.png", width: 55),
-              value: PaymentMethod.telda,
-            ),
-            const SizedBox(height: 10),
-
-            _paymentTile(
-              title: "VISA",
-              subtitle: "Credit / Debit Card",
-              icon: Image.asset("images/03.png", width: 55),
-              value: PaymentMethod.visa,
-            ),
-            const SizedBox(height: 10),
-
-            _paymentTile(
-              title: "Mastercard",
-              subtitle: "Credit / Debit Card",
-              icon: Image.asset("images/02.png", width: 55),
-              value: PaymentMethod.mastercard,
-            ),
-
-            const SizedBox(height: 25),
-
-            Form(key: _formKey, child: _cardForm(text)),
-
-            const SizedBox(height: 25),
-            _payBtn(),
-            const SizedBox(height: 20),
-
-            Center(
-              child: Text("All rights reserved 2025", style: text.bodySmall),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 
   Widget _summaryCard(TextTheme text) {
@@ -262,7 +232,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
             style: text.titleMedium!.copyWith(color: primaryColor),
           ),
           const SizedBox(height: 10),
-
           _row("Order Type", widget.orderType),
           _row("Blood Type", widget.bloodType),
           _row("Hospital", widget.hospital),
@@ -301,16 +270,13 @@ class _PaymentScreenState extends State<PaymentScreen> {
     required PaymentMethod value,
   }) {
     final selected = _selected == value;
-
     return GestureDetector(
-      onTap: () {
-        setState(() {
-          _selected = value;
-          _cardNumber.clear();
-          _expiry.clear();
-          _cvv.clear();
-        });
-      },
+      onTap: () => setState(() {
+        _selected = value;
+        _cardNumber.clear();
+        _expiry.clear();
+        _cvv.clear();
+      }),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.all(14),
@@ -349,14 +315,12 @@ class _PaymentScreenState extends State<PaymentScreen> {
               value: value,
               groupValue: _selected,
               activeColor: Colors.white,
-              onChanged: (v) {
-                setState(() {
-                  _selected = v!;
-                  _cardNumber.clear();
-                  _expiry.clear();
-                  _cvv.clear();
-                });
-              },
+              onChanged: (v) => setState(() {
+                _selected = v!;
+                _cardNumber.clear();
+                _expiry.clear();
+                _cvv.clear();
+              }),
             ),
           ],
         ),
@@ -380,8 +344,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
             style: text.titleMedium!.copyWith(fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 15),
-
-          // حقل رقم البطاقة مع التنسيق التلقائي
           TextFormField(
             controller: _cardNumber,
             keyboardType: TextInputType.number,
@@ -391,30 +353,24 @@ class _PaymentScreenState extends State<PaymentScreen> {
               if (value == null || value.isEmpty) {
                 return 'Please enter card number';
               }
-              String numbers = value.replaceAll(' ', '');
-              if (numbers.length < 16) {
+              if (value.replaceAll(' ', '').length < 16) {
                 return 'Card number must be 16 digits';
               }
               return null;
             },
           ),
           const SizedBox(height: 14),
-
           Row(
             children: [
-              // حقل تاريخ الانتهاء مع التنسيق التلقائي
               Expanded(
                 child: TextFormField(
                   controller: _expiry,
                   keyboardType: TextInputType.number,
-                  maxLength: 5, // MM/YY = 5 أحرف
+                  maxLength: 5,
                   decoration: _input("Expiry (MM/YY)"),
                   validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Required';
-                    }
-                    String numbers = value.replaceAll('/', '');
-                    if (numbers.length < 4) {
+                    if (value == null || value.isEmpty) return 'Required';
+                    if (value.replaceAll('/', '').length < 4) {
                       return 'Invalid date';
                     }
                     return null;
@@ -422,8 +378,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 ),
               ),
               const SizedBox(width: 12),
-
-              // حقل CVV
               Expanded(
                 child: TextFormField(
                   controller: _cvv,
@@ -432,12 +386,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   obscureText: true,
                   decoration: _input("CVV"),
                   validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Required';
-                    }
-                    if (value.length < 3) {
-                      return '3 digits';
-                    }
+                    if (value == null || value.isEmpty) return 'Required';
+                    if (value.length < 3) return '3 digits';
                     return null;
                   },
                 ),
@@ -477,7 +427,21 @@ class _PaymentScreenState extends State<PaymentScreen> {
     );
   }
 
-  void _onPayPressed() {
+  /// تحقق من الإنترنت قبل الدفع
+  void _onPayPressed() async {
+    bool hasInternet = await InternetService.hasInternet();
+
+    if (!hasInternet) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("❌ No Internet Connection"),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 3),
+        ),
+      );
+      return;
+    }
+
     if (_formKey.currentState!.validate()) {
       final method = _selected == PaymentMethod.telda
           ? "Telda"
@@ -501,5 +465,78 @@ class _PaymentScreenState extends State<PaymentScreen> {
         ),
       );
     }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final text = Theme.of(context).textTheme;
+
+    return Scaffold(
+      appBar: AppBar(
+        elevation: 1,
+        backgroundColor: primaryColor,
+        automaticallyImplyLeading: false,
+        title: Row(
+          children: [
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(9),
+              ),
+              child: Icon(Icons.bloodtype, color: primaryColor),
+            ),
+            const SizedBox(width: 10),
+            Text(
+              "Lifelink",
+              style: text.titleLarge!.copyWith(color: Colors.white),
+            ),
+          ],
+        ),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text("Payment", style: text.displayMedium),
+            const SizedBox(height: 15),
+            _summaryCard(text),
+            const SizedBox(height: 25),
+            Text("Payment Method", style: text.titleMedium),
+            const SizedBox(height: 10),
+            _paymentTile(
+              title: "Telda",
+              subtitle: "Fast & secure",
+              icon: Image.asset("images/01.png", width: 55),
+              value: PaymentMethod.telda,
+            ),
+            const SizedBox(height: 10),
+            _paymentTile(
+              title: "VISA",
+              subtitle: "Credit / Debit Card",
+              icon: Image.asset("images/03.png", width: 55),
+              value: PaymentMethod.visa,
+            ),
+            const SizedBox(height: 10),
+            _paymentTile(
+              title: "Mastercard",
+              subtitle: "Credit / Debit Card",
+              icon: Image.asset("images/02.png", width: 55),
+              value: PaymentMethod.mastercard,
+            ),
+            const SizedBox(height: 25),
+            Form(key: _formKey, child: _cardForm(text)),
+            const SizedBox(height: 25),
+            _payBtn(),
+            const SizedBox(height: 20),
+            Center(
+              child: Text("All rights reserved 2025", style: text.bodySmall),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

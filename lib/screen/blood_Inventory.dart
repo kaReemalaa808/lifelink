@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:lifelink/internet_service.dart';
+import 'package:lifelink/network_wrapper.dart';
 
 class BloodInventoryAdminPage extends StatefulWidget {
   const BloodInventoryAdminPage({super.key});
@@ -26,11 +28,33 @@ class _BloodInventoryAdminPageState extends State<BloodInventoryAdminPage> {
     "مستشفى الرحمة",
   ];
 
+  bool _messageVisible = false;
+
+  /// منع تكرار الرسائل
+  void showMessage(String text, {Color color = Colors.black}) {
+    if (_messageVisible) return;
+    _messageVisible = true;
+
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+    ScaffoldMessenger.of(context)
+        .showSnackBar(
+          SnackBar(
+            content: Text(text),
+            backgroundColor: color,
+            duration: const Duration(seconds: 2),
+          ),
+        )
+        .closed
+        .then((_) => _messageVisible = false);
+  }
+
   void _navigateAndCloseDrawer(BuildContext context, String routeName) {
-    Navigator.pop(context); // Close the drawer
+    Navigator.pop(context);
     Navigator.pushNamed(context, routeName);
   }
 
+  /// Edit Dialog
   void _showEditDialog(String bloodType) {
     String? selectedHospital;
     final TextEditingController quantityController = TextEditingController();
@@ -59,9 +83,7 @@ class _BloodInventoryAdminPageState extends State<BloodInventoryAdminPage> {
                   child: Text(hospital),
                 );
               }).toList(),
-              onChanged: (value) {
-                selectedHospital = value;
-              },
+              onChanged: (value) => selectedHospital = value,
             ),
             const SizedBox(height: 16),
             TextField(
@@ -85,20 +107,22 @@ class _BloodInventoryAdminPageState extends State<BloodInventoryAdminPage> {
               backgroundColor: const Color(0xFF00A7B3),
               foregroundColor: Colors.white,
             ),
-            onPressed: () {
+            onPressed: () async {
               if (selectedHospital == null || quantityController.text.isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Please fill all fields")),
-                );
+                showMessage("Please fill all fields", color: Colors.red);
                 return;
               }
+
+              bool hasInternet = await InternetService.hasInternet();
+              if (!hasInternet) {
+                showMessage("❌ No Internet Connection", color: Colors.red);
+                return;
+              }
+
               Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    "$bloodType in $selectedHospital set to ${quantityController.text} bags ✅",
-                  ),
-                ),
+              showMessage(
+                "$bloodType in $selectedHospital set to ${quantityController.text} bags ✅",
+                color: Colors.green,
               );
             },
             child: const Text("Save"),
@@ -108,6 +132,7 @@ class _BloodInventoryAdminPageState extends State<BloodInventoryAdminPage> {
     );
   }
 
+  /// Add Hospital Dialog
   void _showAddHospitalDialog(String bloodType) {
     final TextEditingController hospitalController = TextEditingController();
     final TextEditingController quantityController = TextEditingController();
@@ -154,24 +179,28 @@ class _BloodInventoryAdminPageState extends State<BloodInventoryAdminPage> {
               backgroundColor: const Color(0xFF00A7B3),
               foregroundColor: Colors.white,
             ),
-            onPressed: () {
+            onPressed: () async {
               if (hospitalController.text.isEmpty ||
                   quantityController.text.isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Please fill all fields")),
-                );
+                showMessage("Please fill all fields", color: Colors.red);
                 return;
               }
-              Navigator.pop(context);
+
+              bool hasInternet = await InternetService.hasInternet();
+              if (!hasInternet) {
+                showMessage("❌ No Internet Connection", color: Colors.red);
+                return;
+              }
+
               setState(() {
                 hospitals.add(hospitalController.text);
               });
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    "${hospitalController.text} added with ${quantityController.text} bags ✅",
-                  ),
-                ),
+
+              Navigator.pop(context);
+
+              showMessage(
+                "${hospitalController.text} added with ${quantityController.text} bags ✅",
+                color: Colors.green,
               );
             },
             child: const Text("Save"),
@@ -183,112 +212,106 @@ class _BloodInventoryAdminPageState extends State<BloodInventoryAdminPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      // AppBar و Drawer
-      appBar: AppBar(
-        title: const Text("Blood Inventory Management"),
-        backgroundColor: const Color(0xFF00A7B3),
-        iconTheme: IconThemeData(color: Colors.white),
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: Icon(Icons.menu_open, color: Colors.white, size: 30),
-            onPressed: () => Scaffold.of(context).openDrawer(),
+    return NetworkWrapper(
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text(
+            "Blood Inventory Management",
+            style: TextStyle(
+              color: Colors.white,
+              fontFamily: "Cairo",
+              fontWeight: FontWeight.bold,
+              fontSize: 30,
+            ),
+          ),
+          backgroundColor: const Color(0xFF00A7B3),
+          iconTheme: const IconThemeData(color: Colors.white),
+        ),
+        drawer: Drawer(
+          child: Column(
+            children: [
+              const UserAccountsDrawerHeader(
+                decoration: BoxDecoration(color: Color(0xFF00A7B3)),
+                accountName: Text("Admin"),
+                accountEmail: Text("admin@lifelink.com"),
+                currentAccountPicture: CircleAvatar(
+                  backgroundColor: Colors.white,
+                  child: Icon(
+                    Icons.admin_panel_settings,
+                    color: Colors.white,
+                    size: 40,
+                  ),
+                ),
+              ),
+              ListTile(
+                leading: const Icon(Icons.admin_panel_settings),
+                title: const Text("Admin home"),
+                onTap: () => _navigateAndCloseDrawer(context, "admin"),
+              ),
+              ListTile(
+                leading: const Icon(Icons.people),
+                title: const Text("Users"),
+                onTap: () {},
+              ),
+              ListTile(
+                leading: const Icon(Icons.bar_chart),
+                title: const Text("Reports"),
+                onTap: () {},
+              ),
+              const Spacer(),
+              const Divider(),
+              ListTile(
+                leading: const Icon(Icons.logout, color: Color(0xFF00A7B3)),
+                title: const Text("Logout"),
+                onTap: () => Navigator.pop(context),
+              ),
+            ],
           ),
         ),
-        titleTextStyle: const TextStyle(
-          fontSize: 22,
-          fontWeight: FontWeight.bold,
-          color: Colors.white,
-          fontFamily: "Cairo",
-        ),
-      ),
-      drawer: Drawer(
-        child: Column(
-          children: [
-            UserAccountsDrawerHeader(
-              decoration: const BoxDecoration(color: Color(0xFF00A7B3)),
-              accountName: const Text("Admin"),
-              accountEmail: const Text("admin@lifelink.com"),
-              currentAccountPicture: const CircleAvatar(
-                backgroundColor: Colors.white,
-                child: Icon(
-                  Icons.admin_panel_settings,
-                  color: Colors.white,
-                  size: 40,
-                ),
-              ),
-            ),
-            // ListTile(
-            // leading: const Icon(Icons.dashboard),
-            // title: const Text("Dashboard"),
-            // onTap: () => Navigator.pop(context),
-            //),
-            ListTile(
-              leading: const Icon(Icons.admin_panel_settings),
-              title: const Text("Admin home"),
-              onTap: () => _navigateAndCloseDrawer(context, "admin"),
-            ),
-            ListTile(
-              leading: const Icon(Icons.people),
-              title: const Text("Users"),
-              onTap: () {},
-            ),
-            ListTile(
-              leading: const Icon(Icons.bar_chart),
-              title: const Text("Reports"),
-              onTap: () {},
-            ),
-            const Spacer(),
-            const Divider(),
-            ListTile(
-              leading: const Icon(Icons.logout, color: Color(0xFF00A7B3)),
-              title: const Text("Logout"),
-              onTap: () => Navigator.pop(context),
-            ),
-          ],
-        ),
-      ),
-      // **المحتوى الرئيسي مع Scroll**
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: bloodTypes.map((type) {
-            return Card(
-              margin: const EdgeInsets.symmetric(vertical: 6),
-              child: ListTile(
-                leading: const Icon(Icons.bloodtype, color: Color(0xFF00A7B3)),
-                title: Text(
-                  type,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                subtitle: const Text("Total bags: --"),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF00A7B3),
-                        foregroundColor: Colors.white,
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: bloodTypes.map((type) {
+              return Card(
+                margin: const EdgeInsets.symmetric(vertical: 6),
+                child: ListTile(
+                  leading: const Icon(
+                    Icons.bloodtype,
+                    color: Color(0xFF00A7B3),
+                  ),
+                  title: Text(
+                    type,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  subtitle: const Text("Total bags: --"),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF00A7B3),
+                          foregroundColor: Colors.white,
+                        ),
+                        onPressed: () => _showEditDialog(type),
+                        icon: const Icon(Icons.edit, size: 18),
+                        label: const Text("Edit"),
                       ),
-                      onPressed: () => _showEditDialog(type),
-                      icon: const Icon(Icons.edit, size: 18),
-                      label: const Text("Edit"),
-                    ),
-                    const SizedBox(width: 8),
-                    ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        foregroundColor: Colors.white,
+                      const SizedBox(width: 8),
+                      ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          foregroundColor: Colors.white,
+                        ),
+                        onPressed: () => _showAddHospitalDialog(type),
+                        icon: const Icon(Icons.add, size: 18),
+                        label: const Text("Add"),
                       ),
-                      onPressed: () => _showAddHospitalDialog(type),
-                      icon: const Icon(Icons.add, size: 18),
-                      label: const Text("Add"),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            );
-          }).toList(),
+              );
+            }).toList(),
+          ),
         ),
       ),
     );
