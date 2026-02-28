@@ -28,23 +28,15 @@ class MyApp extends StatelessWidget {
       routes: {
         "scaleDemo": (context) => const IntroScreen(),
         "admin": (context) => const NetworkWrapper(child: AdminPage()),
-
         "homeScreen": (context) => const NetworkWrapper(child: HomeScreen()),
-
         "bloodInventoryAdmin": (context) =>
             const NetworkWrapper(child: BloodInventoryAdminPage()),
-
         "loginScreen": (context) => const LoginScreen(),
-
         "signupScreen": (context) => const SignupScreen(),
-
         "myData": (context) => const NetworkWrapper(child: MyDataScreen()),
-
         "aboutPage": (context) => const NetworkWrapper(child: AboutPage()),
-
         "bloodTypePage": (context) =>
             const NetworkWrapper(child: BloodTypePage()),
-
         "deliverypage": (context) =>
             const NetworkWrapper(child: DeliveryPage()),
       },
