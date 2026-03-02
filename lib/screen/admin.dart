@@ -112,7 +112,9 @@ class _AdminPageState extends State<AdminPage> {
             ListTile(
               leading: const Icon(Icons.people),
               title: const Text("Users"),
-              onTap: () {},
+              onTap: () {
+                _navigateAndCloseDialog(context, "AdminOrdersScreen");
+              },
             ),
 
             ListTile(
@@ -141,6 +143,7 @@ class _AdminPageState extends State<AdminPage> {
           crossAxisCount: 2,
           crossAxisSpacing: 16,
           mainAxisSpacing: 16,
+          childAspectRatio: .9,
           children: [
             _buildDashboardCard(
               "Users",
