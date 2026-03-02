@@ -44,6 +44,12 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
   List<String> get hospitals =>
       allOrders.map((e) => e['source'].toString()).toSet().toList();
 
+  // دالة التنقل وإغلاق القائمة الجانبية
+  void _navigateAndCloseDrawer(BuildContext context, String routeName) {
+    Navigator.pop(context); // إغلاق الـ Drawer
+    Navigator.pushNamed(context, routeName);
+  }
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -54,12 +60,15 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
           backgroundColor: mainColor,
           elevation: 2,
           toolbarHeight: 70,
+          // أيقونة الـ Drawer هتظهر هنا تلقائياً لأننا أضفنا Drawer في الـ Scaffold
+          iconTheme: const IconThemeData(color: Colors.white),
           title: const Text(
             "Orders Management",
             style: TextStyle(
               fontWeight: FontWeight.bold,
               color: Colors.white,
               fontSize: 22,
+              fontFamily: "Cairo", // نفس خط صفحة المخزن
             ),
           ),
           centerTitle: true,
@@ -88,7 +97,6 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
             ),
           ],
           bottom: TabBar(
-            isScrollable: false,
             indicatorColor: Colors.white,
             indicatorWeight: 5,
             labelColor: Colors.white,
@@ -104,6 +112,64 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
             ],
           ),
         ),
+
+        // --- إضافة الـ Drawer اللي طلبتها بالظبط ---
+        drawer: Drawer(
+          child: Column(
+            children: [
+              const UserAccountsDrawerHeader(
+                decoration: BoxDecoration(color: Color(0xFF00A7B3)),
+                accountName: Text("Admin"),
+                accountEmail: Text("admin@lifelink.com"),
+                currentAccountPicture: CircleAvatar(
+                  backgroundColor: Colors.white,
+                  child: Icon(
+                    Icons.admin_panel_settings,
+                    color: Color(0xFF00A7B3),
+                    size: 40,
+                  ),
+                ),
+              ),
+              ListTile(
+                leading: const Icon(Icons.admin_panel_settings),
+                title: const Text("Admin home"),
+                onTap: () => _navigateAndCloseDrawer(context, "admin"),
+              ),
+              ListTile(
+                leading: const Icon(
+                  Icons.list_alt,
+                  color: Color(0xFF00A7B3),
+                ), // خليت دي لونها مميز لأنها الصفحة الحالية
+                title: const Text("Orders"),
+                onTap: () => Navigator.pop(
+                  context,
+                ), // إغلاق فقط لأننا في صفحة الاوردرز فعلاً
+              ),
+              ListTile(
+                leading: const Icon(Icons.inventory_2_outlined),
+                title: const Text("Inventory"),
+                onTap: () => _navigateAndCloseDrawer(
+                  context,
+                  "bloodInventoryAdminPage",
+                ), // تأكد من اسم الـ route
+              ),
+              ListTile(
+                leading: const Icon(Icons.bar_chart),
+                title: const Text("Reports"),
+                onTap: () {},
+              ),
+              const Spacer(),
+              const Divider(),
+              ListTile(
+                leading: const Icon(Icons.logout, color: Color(0xFF00A7B3)),
+                title: const Text("Logout"),
+                onTap: () => Navigator.pop(context),
+              ),
+            ],
+          ),
+        ),
+
+        // --- نهاية الـ Drawer ---
         body: Column(
           children: [
             if (selectedHospital != null)
@@ -146,6 +212,7 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
     );
   }
 
+  // بقية دوال الصفحة (نفس الكود السابق للـ List والـ Card والـ Update)
   Widget _buildOrdersList(String status) {
     final filtered = allOrders
         .where(
@@ -180,14 +247,10 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
         ],
       ),
       child: InkWell(
-        // التعديل هنا: استخدام InkWell لجعل الكارت قابل للضغط
         borderRadius: BorderRadius.circular(15),
         onTap: () {
-          if (order['isViewed'] == false) {
-            setState(() {
-              order['isViewed'] = true; // بمجرد الضغط تختفي علامة NEW
-            });
-          }
+          if (order['isViewed'] == false)
+            setState(() => order['isViewed'] = true);
         },
         child: Column(
           children: [
@@ -289,7 +352,6 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
                     isBold: true,
                     valueSize: 15,
                   ),
-
                   if (status == "active") _buildActionButtons(order['id']),
                 ],
               ),

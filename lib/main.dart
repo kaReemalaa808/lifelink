@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
       builder: (context, child) {
         return NetworkWrapper(child: child!);
       },
-      home: const AdminOrdersScreen(),
+      home: const AdminPage(),
       routes: {
         "scaleDemo": (context) => const IntroScreen(),
         "admin": (context) => const AdminPage(),

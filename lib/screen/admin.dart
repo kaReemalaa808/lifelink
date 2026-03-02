@@ -9,12 +9,12 @@ class AdminPage extends StatefulWidget {
 
 class _AdminPageState extends State<AdminPage> {
   // بيانات تجريبية
-  int usersCount = 720; // عدد المستخدمين
-  int hospitalsCount = 90; // عدد المستشفيات
-  int bagsAvailable = 450; // المخزون
-  int bagsReserved = 320; // المحجوز
-  int bagsToDeliver = 100; // سيتم التوصيل
-  int bagsDelivered = 280; // تم التوصيل
+  int usersCount = 720;
+  int hospitalsCount = 90;
+  int bagsAvailable = 450;
+  int bagsReserved = 320;
+  int bagsToDeliver = 100;
+  int bagsDelivered = 280;
 
   void _navigateAndCloseDialog(BuildContext context, String routeName) {
     if (Navigator.canPop(context)) {
@@ -62,10 +62,10 @@ class _AdminPageState extends State<AdminPage> {
         centerTitle: true,
         title: const Text("   Admin Home   "),
         backgroundColor: const Color(0xFF00A7B3),
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: Colors.white),
         leading: Builder(
           builder: (context) => IconButton(
-            icon: Icon(Icons.menu_open, color: Colors.white, size: 30),
+            icon: const Icon(Icons.menu_open, color: Colors.white, size: 30),
             onPressed: () => Scaffold.of(context).openDrawer(),
           ),
         ),
@@ -80,55 +80,74 @@ class _AdminPageState extends State<AdminPage> {
       drawer: Drawer(
         child: Column(
           children: [
-            UserAccountsDrawerHeader(
-              decoration: const BoxDecoration(color: Color(0xFF00A7B3)),
-              accountName: const Text("Admin"),
-              accountEmail: const Text("admin@lifelink.com"),
-              currentAccountPicture: const CircleAvatar(
+            const UserAccountsDrawerHeader(
+              decoration: BoxDecoration(color: Color(0xFF00A7B3)),
+              accountName: Text("Admin"),
+              accountEmail: Text("admin@lifelink.com"),
+              currentAccountPicture: CircleAvatar(
                 backgroundColor: Colors.white,
                 child: Icon(
                   Icons.admin_panel_settings,
-                  color: Colors.black,
+                  color: Color(0xFF00A7B3),
                   size: 40,
                 ),
               ),
             ),
-
-            //ListTile(
-            // leading: const Icon(Icons.dashboard),
-            // title: const Text("Dashboard"),
-            // onTap: () {
-            //  Navigator.pop(context);
-            //},
-            //),
+            // الصفحة الحالية (Home) بلون اللوجو
             ListTile(
-              leading: const Icon(Icons.inventory),
-              title: const Text("Blood Inventory"),
+              leading: const Icon(
+                Icons.admin_panel_settings,
+                color: Color(0xFF00A7B3),
+              ),
+              title: const Text(
+                "Admin Home",
+                style: TextStyle(
+                  color: Color(0xFF00A7B3),
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              onTap: () => Navigator.pop(context),
+            ),
+            // باقي الصفحات باللون الأسود
+            ListTile(
+              leading: const Icon(
+                Icons.inventory_2_outlined,
+                color: Colors.black,
+              ),
+              title: const Text(
+                "Blood Inventory",
+                style: TextStyle(color: Colors.black),
+              ),
               onTap: () {
                 _navigateAndCloseDialog(context, "bloodInventoryAdmin");
               },
             ),
-
             ListTile(
-              leading: const Icon(Icons.people),
-              title: const Text("Users"),
+              leading: const Icon(Icons.list_alt, color: Colors.black),
+              title: const Text(
+                "Orders",
+                style: TextStyle(color: Colors.black),
+              ),
               onTap: () {
-                _navigateAndCloseDialog(context, "AdminOrdersScreen");
+                _navigateAndCloseDialog(context, "adminOrdersScreen");
               },
             ),
-
             ListTile(
-              leading: const Icon(Icons.bar_chart),
-              title: const Text("Reports"),
+              leading: const Icon(Icons.bar_chart, color: Colors.black),
+              title: const Text(
+                "Reports",
+                style: TextStyle(color: Colors.black),
+              ),
               onTap: () {},
             ),
-
             const Spacer(),
             const Divider(),
-
             ListTile(
-              leading: const Icon(Icons.logout, color: Color(0xFF00A7B3)),
-              title: const Text("Logout"),
+              leading: const Icon(Icons.logout, color: Colors.black),
+              title: const Text(
+                "Logout",
+                style: TextStyle(color: Colors.black),
+              ),
               onTap: () {
                 Navigator.pop(context);
               },
@@ -174,7 +193,7 @@ class _AdminPageState extends State<AdminPage> {
               bagsToDeliver,
               Icons.local_shipping,
               Colors.amber,
-            ), // عربية توصيل
+            ),
             _buildDashboardCard(
               "Delivered",
               bagsDelivered,

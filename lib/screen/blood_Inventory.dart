@@ -28,6 +28,7 @@ class _BloodInventoryAdminPageState extends State<BloodInventoryAdminPage> {
     "مستشفى الرحمة",
   ];
 
+  final Color mainColor = const Color(0xFF00A7B3);
   bool _messageVisible = false;
 
   /// منع تكرار الرسائل
@@ -63,10 +64,10 @@ class _BloodInventoryAdminPageState extends State<BloodInventoryAdminPage> {
       context: context,
       builder: (_) => AlertDialog(
         title: Row(
-          children: const [
-            Icon(Icons.edit, color: Color(0xFF00A7B3)),
-            SizedBox(width: 8),
-            Text("Edit Blood Stock"),
+          children: [
+            Icon(Icons.edit, color: mainColor),
+            const SizedBox(width: 8),
+            Text("Edit $bloodType Stock"),
           ],
         ),
         content: Column(
@@ -98,34 +99,25 @@ class _BloodInventoryAdminPageState extends State<BloodInventoryAdminPage> {
         ),
         actions: [
           TextButton(
-            style: TextButton.styleFrom(foregroundColor: Colors.black),
             onPressed: () => Navigator.pop(context),
-            child: const Text("Cancel"),
+            child: const Text("Cancel", style: TextStyle(color: Colors.black)),
           ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF00A7B3),
-              foregroundColor: Colors.white,
-            ),
+            style: ElevatedButton.styleFrom(backgroundColor: mainColor),
             onPressed: () async {
               if (selectedHospital == null || quantityController.text.isEmpty) {
                 showMessage("Please fill all fields", color: Colors.red);
                 return;
               }
-
               bool hasInternet = await InternetService.hasInternet();
               if (!hasInternet) {
                 showMessage("❌ No Internet Connection", color: Colors.red);
                 return;
               }
-
               Navigator.pop(context);
-              showMessage(
-                "$bloodType in $selectedHospital set to ${quantityController.text} bags ✅",
-                color: Colors.green,
-              );
+              showMessage("Updated successfully ✅", color: Colors.green);
             },
-            child: const Text("Save"),
+            child: const Text("Save", style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -141,10 +133,10 @@ class _BloodInventoryAdminPageState extends State<BloodInventoryAdminPage> {
       context: context,
       builder: (_) => AlertDialog(
         title: Row(
-          children: const [
-            Icon(Icons.add, color: Color(0xFF00A7B3)),
-            SizedBox(width: 8),
-            Text("Add Hospital"),
+          children: [
+            Icon(Icons.add, color: mainColor),
+            const SizedBox(width: 8),
+            const Text("Add Hospital"),
           ],
         ),
         content: Column(
@@ -170,40 +162,21 @@ class _BloodInventoryAdminPageState extends State<BloodInventoryAdminPage> {
         ),
         actions: [
           TextButton(
-            style: TextButton.styleFrom(foregroundColor: Colors.black),
             onPressed: () => Navigator.pop(context),
-            child: const Text("Cancel"),
+            child: const Text("Cancel", style: TextStyle(color: Colors.black)),
           ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF00A7B3),
-              foregroundColor: Colors.white,
-            ),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
             onPressed: () async {
               if (hospitalController.text.isEmpty ||
                   quantityController.text.isEmpty) {
                 showMessage("Please fill all fields", color: Colors.red);
                 return;
               }
-
-              bool hasInternet = await InternetService.hasInternet();
-              if (!hasInternet) {
-                showMessage("❌ No Internet Connection", color: Colors.red);
-                return;
-              }
-
-              setState(() {
-                hospitals.add(hospitalController.text);
-              });
-
               Navigator.pop(context);
-
-              showMessage(
-                "${hospitalController.text} added with ${quantityController.text} bags ✅",
-                color: Colors.green,
-              );
+              showMessage("Hospital added successfully ✅", color: Colors.green);
             },
-            child: const Text("Save"),
+            child: const Text("Add", style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -221,24 +194,25 @@ class _BloodInventoryAdminPageState extends State<BloodInventoryAdminPage> {
               color: Colors.white,
               fontFamily: "Cairo",
               fontWeight: FontWeight.bold,
-              fontSize: 30,
+              fontSize: 22,
             ),
           ),
-          backgroundColor: const Color(0xFF00A7B3),
+          backgroundColor: mainColor,
           iconTheme: const IconThemeData(color: Colors.white),
+          centerTitle: true,
         ),
         drawer: Drawer(
           child: Column(
             children: [
-              const UserAccountsDrawerHeader(
-                decoration: BoxDecoration(color: Color(0xFF00A7B3)),
-                accountName: Text("Admin"),
-                accountEmail: Text("admin@lifelink.com"),
-                currentAccountPicture: CircleAvatar(
+              UserAccountsDrawerHeader(
+                decoration: BoxDecoration(color: mainColor),
+                accountName: const Text("Admin"),
+                accountEmail: const Text("admin@lifelink.com"),
+                currentAccountPicture: const CircleAvatar(
                   backgroundColor: Colors.white,
                   child: Icon(
                     Icons.admin_panel_settings,
-                    color: Colors.white,
+                    color: Color(0xFF00A7B3),
                     size: 40,
                   ),
                 ),
@@ -249,14 +223,21 @@ class _BloodInventoryAdminPageState extends State<BloodInventoryAdminPage> {
                 onTap: () => _navigateAndCloseDrawer(context, "admin"),
               ),
               ListTile(
-                leading: const Icon(Icons.people),
-                title: const Text("Users"),
-                onTap: () {},
+                leading: const Icon(Icons.list_alt),
+                title: const Text("Orders"),
+                onTap: () =>
+                    _navigateAndCloseDrawer(context, "adminOrdersScreen"),
               ),
               ListTile(
-                leading: const Icon(Icons.bar_chart),
-                title: const Text("Reports"),
-                onTap: () {},
+                leading: Icon(Icons.inventory_2, color: mainColor),
+                title: Text(
+                  "Inventory",
+                  style: TextStyle(
+                    color: mainColor,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                onTap: () => Navigator.pop(context),
               ),
               const Spacer(),
               const Divider(),
@@ -275,10 +256,7 @@ class _BloodInventoryAdminPageState extends State<BloodInventoryAdminPage> {
               return Card(
                 margin: const EdgeInsets.symmetric(vertical: 6),
                 child: ListTile(
-                  leading: const Icon(
-                    Icons.bloodtype,
-                    color: Color(0xFF00A7B3),
-                  ),
+                  leading: Icon(Icons.bloodtype, color: mainColor),
                   title: Text(
                     type,
                     style: const TextStyle(fontWeight: FontWeight.bold),
@@ -289,7 +267,7 @@ class _BloodInventoryAdminPageState extends State<BloodInventoryAdminPage> {
                     children: [
                       ElevatedButton.icon(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF00A7B3),
+                          backgroundColor: mainColor,
                           foregroundColor: Colors.white,
                         ),
                         onPressed: () => _showEditDialog(type),
